@@ -1,3 +1,5 @@
+import { MapPin } from "lucide-react";
+
 interface PromoBannerProps {
   image: string;
   title: string;
@@ -32,8 +34,11 @@ const PromoBanner = ({ image, title, subtitle, buttonText, buttonHref, reverse =
               {buttonText && buttonHref && (
                 <a
                   href={buttonHref}
-                  className="inline-block bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
                 >
+                  <MapPin className="h-5 w-5" />
                   {buttonText}
                 </a>
               )}
