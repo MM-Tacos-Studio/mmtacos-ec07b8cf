@@ -7,7 +7,7 @@ import PromoBanner from "@/components/PromoBanner";
 import DrinksSection from "@/components/DrinksSection";
 import Footer from "@/components/Footer";
 
-import promoBanner1 from "@/assets/promo-banner-1.jpg";
+import mmKfcBox from "@/assets/mm-kfc-box.jpeg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,16 +26,16 @@ const Index = () => {
       {/* Tacos Section */}
       <TacosSection searchQuery={searchQuery} />
 
-      {/* Promo Banner 1 */}
+      {/* Promo Banner - MM'KFC */}
       <PromoBanner
-        image={promoBanner1}
-        title="Menu Complet"
-        subtitle="Tacos + Frites + Boisson à partir de 5000 FCFA"
-        buttonText="Commander Maintenant"
-        buttonHref="https://wa.me/22384437961"
+        image={mmKfcBox}
+        title="Poulet Pané Croustillant"
+        subtitle="MM'KFC - Un plaisir irrésistible à chaque bouchée!"
+        buttonText="Nous Trouver"
+        buttonHref="https://www.google.com/maps/search/?api=1&query=Magnambougou+Bamako+Mali"
       />
 
-      {/* Drinks Section */}
+      {/* Drinks & Supplements Section */}
       <DrinksSection />
 
       {/* Footer */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Plus, Minus, MessageCircle } from "lucide-react";
+import { Plus, Minus, MessageCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ interface Supplement {
   id: string;
   name: string;
   price: number;
+  category: "boisson" | "supplement";
 }
 
 interface OrderModalProps {
@@ -24,12 +25,19 @@ interface OrderModalProps {
 }
 
 const supplements: Supplement[] = [
-  { id: "frites", name: "Frites", price: 500 },
-  { id: "coca", name: "Coca-Cola", price: 500 },
-  { id: "sprite", name: "Sprite", price: 500 },
-  { id: "fanta", name: "Fanta", price: 500 },
-  { id: "eau", name: "Eau minérale", price: 300 },
-  { id: "sauce-extra", name: "Sauce supplémentaire", price: 200 },
+  // Suppléments
+  { id: "frites-simple", name: "Frites Simple", price: 1000, category: "supplement" },
+  { id: "frites-large", name: "Frites Large", price: 1500, category: "supplement" },
+  { id: "oeuf-nature", name: "Oeuf Nature", price: 500, category: "supplement" },
+  { id: "fromage", name: "Fromage", price: 250, category: "supplement" },
+  { id: "sauce-extra", name: "Sauce supplémentaire", price: 200, category: "supplement" },
+  // Boissons
+  { id: "coca", name: "Coca-Cola", price: 500, category: "boisson" },
+  { id: "sprite", name: "Sprite", price: 500, category: "boisson" },
+  { id: "fanta", name: "Fanta Orange", price: 500, category: "boisson" },
+  { id: "eau", name: "Eau Minérale", price: 300, category: "boisson" },
+  { id: "jus-orange", name: "Jus d'Orange", price: 700, category: "boisson" },
+  { id: "jus-mangue", name: "Jus de Mangue", price: 700, category: "boisson" },
 ];
 
 const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
@@ -90,6 +98,9 @@ Merci!`;
     onClose();
   };
 
+  const supplementItems = supplements.filter(s => s.category === "supplement");
+  const boissonItems = supplements.filter(s => s.category === "boisson");
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
@@ -132,9 +143,9 @@ Merci!`;
 
         {/* Supplements */}
         <div>
-          <h4 className="font-bold mb-3">Ajouter des suppléments</h4>
+          <h4 className="font-bold mb-3 text-primary">Suppléments</h4>
           <div className="space-y-2">
-            {supplements.map((supplement) => (
+            {supplementItems.map((supplement) => (
               <div
                 key={supplement.id}
                 className="flex items-center justify-between p-3 bg-muted rounded-lg"
@@ -157,6 +168,43 @@ Merci!`;
                   </span>
                   <button
                     onClick={() => handleSupplementChange(supplement.id, 1)}
+                    className="bg-primary text-primary-foreground p-1.5 rounded-full hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Boissons */}
+        <div>
+          <h4 className="font-bold mb-3 text-primary">Boissons</h4>
+          <div className="space-y-2">
+            {boissonItems.map((boisson) => (
+              <div
+                key={boisson.id}
+                className="flex items-center justify-between p-3 bg-muted rounded-lg"
+              >
+                <div>
+                  <span className="font-medium">{boisson.name}</span>
+                  <span className="text-muted-foreground text-sm ml-2">
+                    +{boisson.price} FCFA
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleSupplementChange(boisson.id, -1)}
+                    className="bg-card p-1.5 rounded-full hover:bg-accent transition-colors"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <span className="font-medium w-6 text-center">
+                    {selectedSupplements[boisson.id] || 0}
+                  </span>
+                  <button
+                    onClick={() => handleSupplementChange(boisson.id, 1)}
                     className="bg-primary text-primary-foreground p-1.5 rounded-full hover:opacity-90 transition-opacity"
                   >
                     <Plus className="h-3 w-3" />
