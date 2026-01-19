@@ -1,14 +1,19 @@
-import promoImage from "@/assets/promo-drinks.jpg";
+import drinkCoca from "@/assets/drink-coca.png";
+import drink7up from "@/assets/drink-7up.png";
+import drinkDjino from "@/assets/drink-djino.png";
+import drinkLimonade from "@/assets/drink-limonade.png";
+import drinkPresseaMangue from "@/assets/drink-pressea-mangue.png";
+import drinkPresseaCoco from "@/assets/drink-pressea-coco.png";
+import drinkKirene from "@/assets/drink-kirene.png";
 
 const drinks = [
-  { id: "7up", name: "7UP Canette", price: 750, emoji: "🥤" },
-  { id: "kirene", name: "Eau Minérale Kirene 50cl", price: 500, emoji: "💧" },
-  { id: "mirinda-fruity", name: "Mirinda Fruity 300ml", price: 750, emoji: "🍊" },
-  { id: "mirinda-canette", name: "Mirinda Fruity Canette", price: 750, emoji: "🥫" },
-  { id: "mirinda-1l", name: "Mirinda Orange 1.25L", price: 1200, emoji: "🍹" },
-  { id: "mirinda-300", name: "Mirinda Orange 300ml", price: 750, emoji: "🧃" },
-  { id: "pepsi", name: "Pepsi 1.25L", price: 1200, emoji: "🥤" },
-  { id: "coca", name: "Coca-Cola", price: 500, emoji: "🥤" },
+  { id: "coca", name: "Coca-Cola 33cl", price: 500, image: drinkCoca },
+  { id: "7up", name: "7UP Canette", price: 750, image: drink7up },
+  { id: "djino", name: "D'jino Cocktail de Fruits", price: 750, image: drinkDjino },
+  { id: "limonade", name: "Limonade Citron Vert", price: 500, image: drinkLimonade },
+  { id: "pressea-mangue", name: "Pressea Fresh Mangue", price: 750, image: drinkPresseaMangue },
+  { id: "pressea-coco", name: "Pressea Fresh Mangue Coco", price: 750, image: drinkPresseaCoco },
+  { id: "kirene", name: "Eau Kirène 50cl", price: 500, image: drinkKirene },
 ];
 
 const DrinksSection = () => {
@@ -30,9 +35,13 @@ const DrinksSection = () => {
               className="bg-card rounded-xl shadow-card hover:shadow-hover transition-all duration-300 animate-fade-in overflow-hidden"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              {/* Image placeholder with emoji */}
-              <div className="h-32 bg-gradient-to-br from-primary/20 to-secondary/30 flex items-center justify-center">
-                <span className="text-5xl">{drink.emoji}</span>
+              {/* Image */}
+              <div className="h-40 bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center p-4">
+                <img 
+                  src={drink.image} 
+                  alt={drink.name}
+                  className="h-full w-auto object-contain"
+                />
               </div>
               <div className="p-4">
                 <p className="text-lg font-extrabold text-primary mb-1">
