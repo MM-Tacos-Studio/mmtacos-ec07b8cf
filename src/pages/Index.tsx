@@ -1,7 +1,9 @@
 import { useState } from "react";
 import TopBar from "@/components/TopBar";
 import Navbar from "@/components/Navbar";
+import PromoMarquee from "@/components/PromoMarquee";
 import HeroSection from "@/components/HeroSection";
+import TrustSection from "@/components/TrustSection";
 import TacosSection from "@/components/TacosSection";
 import PromoBanner from "@/components/PromoBanner";
 import DrinksSection from "@/components/DrinksSection";
@@ -20,8 +22,14 @@ const Index = () => {
       {/* Navbar */}
       <Navbar />
 
+      {/* Promo Marquee Banner */}
+      <PromoMarquee />
+
       {/* Hero Section with Search */}
       <HeroSection onSearch={setSearchQuery} />
+
+      {/* Trust Section */}
+      <TrustSection />
 
       {/* Tacos Section */}
       <TacosSection searchQuery={searchQuery} />
