@@ -9,11 +9,10 @@ import tacosKfc from "@/assets/tacos-kfc.jpeg";
 import tacosCordonBleu from "@/assets/tacos-cordon-bleu.jpeg";
 import tacosHotdog from "@/assets/tacos-hotdog-new.jpeg";
 import tacosMerguez from "@/assets/tacos-merguez.jpeg";
-import tacosCrevettes from "@/assets/tacos-crevettes.jpeg";
-import tacosSaumon from "@/assets/tacos-saumon-new.jpeg";
+import tacosCrevettes from "@/assets/tacos-crevettes-2.jpeg";
+import tacosSaumon from "@/assets/tacos-saumon-2.jpeg";
 import tacosCorNedBeef from "@/assets/tacos-corned-beef.jpeg";
 import tacosPaneMiel from "@/assets/tacos-pane-miel.jpeg";
-
 interface TacosSectionProps {
   searchQuery: string;
 }
@@ -96,6 +95,7 @@ const tacos: Taco[] = [
     image: tacosPaneMiel,
     sizes: [
       { name: "M", price: 5500 },
+      { name: "XL", price: 8000 },
     ],
     requiresMeatChoice: true,
   },
