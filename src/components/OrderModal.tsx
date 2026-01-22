@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus, MessageCircle } from "lucide-react";
 import {
   Dialog,
@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { Taco, TacoSize } from "./TacosSection";
 
 interface Supplement {
   id: string;
@@ -17,20 +18,19 @@ interface Supplement {
 interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  taco: {
-    name: string;
-    price: number;
-    image: string;
-  } | null;
+  taco: Taco | null;
 }
 
 const supplements: Supplement[] = [
   // Suppléments
-  { id: "frites-simple", name: "Frites Simple", price: 1000, category: "supplement" },
-  { id: "frites-large", name: "Frites Large", price: 1500, category: "supplement" },
-  { id: "oeuf-nature", name: "Oeuf Nature", price: 500, category: "supplement" },
-  { id: "fromage", name: "Fromage", price: 250, category: "supplement" },
-  { id: "sauce-extra", name: "Sauce supplémentaire", price: 200, category: "supplement" },
+  { id: "ananas", name: "Tranche d'ananas", price: 500, category: "supplement" },
+  { id: "fromage-fondant", name: "Fromage fondant", price: 500, category: "supplement" },
+  { id: "frites", name: "Frites croustillantes", price: 500, category: "supplement" },
+  { id: "olives", name: "Olives", price: 500, category: "supplement" },
+  { id: "gratine", name: "Gratiné avec fromage", price: 1000, category: "supplement" },
+  { id: "jambon", name: "Jambon", price: 500, category: "supplement" },
+  { id: "oeufs", name: "Œufs", price: 500, category: "supplement" },
+  { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement" },
   // Boissons
   { id: "coca", name: "Coca-Cola", price: 500, category: "boisson" },
   { id: "sprite", name: "Sprite", price: 500, category: "boisson" },
@@ -43,6 +43,18 @@ const supplements: Supplement[] = [
 const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
   const [selectedSupplements, setSelectedSupplements] = useState<Record<string, number>>({});
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<TacoSize | null>(null);
+  const [meatChoice, setMeatChoice] = useState<"viande" | "poulet" | null>(null);
+
+  // Reset state when modal opens with new taco
+  useEffect(() => {
+    if (taco && isOpen) {
+      setSelectedSupplements({});
+      setQuantity(1);
+      setSelectedSize(taco.sizes?.[0] || null);
+      setMeatChoice(null);
+    }
+  }, [taco, isOpen]);
 
   if (!taco) return null;
 
@@ -59,6 +71,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
   };
 
   const calculateTotal = () => {
+    const basePrice = selectedSize?.price || taco.price;
     const supplementsTotal = Object.entries(selectedSupplements).reduce(
       (sum, [id, qty]) => {
         const supplement = supplements.find((s) => s.id === id);
@@ -66,10 +79,15 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
       },
       0
     );
-    return (taco.price + supplementsTotal) * quantity;
+    return (basePrice + supplementsTotal) * quantity;
   };
 
   const handleOrder = () => {
+    // Validation pour Pané Miel
+    if (taco.requiresMeatChoice && !meatChoice) {
+      return;
+    }
+
     const supplementsList = Object.entries(selectedSupplements)
       .filter(([_, qty]) => qty > 0)
       .map(([id, qty]) => {
@@ -78,9 +96,13 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
       })
       .join(", ");
 
+    const sizeName = selectedSize ? ` (Taille ${selectedSize.name})` : "";
+    const meatText = meatChoice ? ` - ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
+    const basePrice = selectedSize?.price || taco.price;
+
     const message = `Bonjour! Je voudrais commander:
     
-🌮 ${quantity}x ${taco.name} (${taco.price.toLocaleString()} FCFA)
+🌮 ${quantity}x ${taco.name}${sizeName}${meatText} (${basePrice.toLocaleString()} FCFA)
 ${supplementsList ? `➕ Suppléments: ${supplementsList}` : ""}
 
 💰 Total: ${calculateTotal().toLocaleString()} FCFA
@@ -89,17 +111,20 @@ Merci!`;
 
     const whatsappUrl = `https://wa.me/22384437961?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
-    onClose();
+    handleClose();
   };
 
   const handleClose = () => {
     setSelectedSupplements({});
     setQuantity(1);
+    setSelectedSize(taco?.sizes?.[0] || null);
+    setMeatChoice(null);
     onClose();
   };
 
   const supplementItems = supplements.filter(s => s.category === "supplement");
   const boissonItems = supplements.filter(s => s.category === "boisson");
+  const hasSizes = taco.sizes && taco.sizes.length > 1;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -117,9 +142,66 @@ Merci!`;
           />
           <div className="flex-1">
             <h3 className="font-bold text-foreground">{taco.name}</h3>
-            <p className="text-primary font-bold">{taco.price.toLocaleString()} FCFA</p>
+            <p className="text-primary font-bold">
+              {(selectedSize?.price || taco.price).toLocaleString()} FCFA
+            </p>
           </div>
         </div>
+
+        {/* Size Selection */}
+        {hasSizes && (
+          <div className="p-4 bg-muted rounded-lg">
+            <span className="font-bold text-primary mb-3 block">Choisir la taille</span>
+            <div className="flex gap-3">
+              {taco.sizes!.map((size) => (
+                <button
+                  key={size.name}
+                  onClick={() => setSelectedSize(size)}
+                  className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+                    selectedSize?.name === size.name
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card text-foreground hover:bg-accent"
+                  }`}
+                >
+                  <div className="text-lg">{size.name}</div>
+                  <div className="text-sm opacity-80">{size.price.toLocaleString()} FCFA</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Meat Choice for Pané Miel */}
+        {taco.requiresMeatChoice && (
+          <div className="p-4 bg-muted rounded-lg">
+            <span className="font-bold text-primary mb-3 block">Choisir la viande *</span>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setMeatChoice("viande")}
+                className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+                  meatChoice === "viande"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-foreground hover:bg-accent"
+                }`}
+              >
+                Viande
+              </button>
+              <button
+                onClick={() => setMeatChoice("poulet")}
+                className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+                  meatChoice === "poulet"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-foreground hover:bg-accent"
+                }`}
+              >
+                Poulet
+              </button>
+            </div>
+            {taco.requiresMeatChoice && !meatChoice && (
+              <p className="text-destructive text-sm mt-2">* Veuillez choisir viande ou poulet</p>
+            )}
+          </div>
+        )}
 
         {/* Quantity */}
         <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
@@ -225,7 +307,8 @@ Merci!`;
           </div>
           <button
             onClick={handleOrder}
-            className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            disabled={taco.requiresMeatChoice && !meatChoice}
+            className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <MessageCircle className="h-5 w-5" />
             Commander via WhatsApp
