@@ -324,7 +324,12 @@ Merci!`;
           <button
             onClick={handleOrder}
             disabled={taco.requiresMeatChoice && !meatChoice}
-            className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
+              shadow-[0_4px_0_0] shadow-[#1da851]
+              hover:-translate-y-0.5 hover:shadow-[0_6px_0_0] hover:shadow-[#1da851]
+              active:translate-y-0 active:shadow-none
+              transition-all duration-150
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0"
           >
             <MessageCircle className="h-5 w-5" />
             Commander via WhatsApp
