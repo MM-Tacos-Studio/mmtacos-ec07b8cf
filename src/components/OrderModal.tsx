@@ -8,11 +8,22 @@ import {
 } from "@/components/ui/dialog";
 import type { Taco, TacoSize } from "./TacosSection";
 
+// Import supplement images
+import supplementFromage from "@/assets/supplement-fromage.png";
+import supplementFrites from "@/assets/supplement-frites.png";
+import supplementAnanas from "@/assets/supplement-ananas.png";
+import supplementOlives from "@/assets/supplement-olives.png";
+import supplementGratine from "@/assets/supplement-gratine.png";
+import supplementJambon from "@/assets/supplement-jambon.png";
+import supplementOeufs from "@/assets/supplement-oeufs.png";
+import supplementHotdog from "@/assets/supplement-hotdog.png";
+
 interface Supplement {
   id: string;
   name: string;
   price: number;
   category: "boisson" | "supplement";
+  image?: string;
 }
 
 interface OrderModalProps {
@@ -22,15 +33,15 @@ interface OrderModalProps {
 }
 
 const supplements: Supplement[] = [
-  // Suppléments
-  { id: "ananas", name: "Tranche d'ananas", price: 500, category: "supplement" },
-  { id: "fromage-fondant", name: "Fromage fondant", price: 500, category: "supplement" },
-  { id: "frites", name: "Frites croustillantes", price: 500, category: "supplement" },
-  { id: "olives", name: "Olives", price: 500, category: "supplement" },
-  { id: "gratine", name: "Gratiné avec fromage", price: 1000, category: "supplement" },
-  { id: "jambon", name: "Jambon", price: 500, category: "supplement" },
-  { id: "oeufs", name: "Œufs", price: 500, category: "supplement" },
-  { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement" },
+  // Suppléments (ordered: fromage, frites, then others)
+  { id: "fromage-fondant", name: "Fromage fondant", price: 500, category: "supplement", image: supplementFromage },
+  { id: "frites", name: "Frites croustillantes", price: 500, category: "supplement", image: supplementFrites },
+  { id: "ananas", name: "Tranche d'ananas", price: 500, category: "supplement", image: supplementAnanas },
+  { id: "olives", name: "Olives", price: 500, category: "supplement", image: supplementOlives },
+  { id: "gratine", name: "Gratiné avec fromage", price: 1000, category: "supplement", image: supplementGratine },
+  { id: "jambon", name: "Jambon", price: 500, category: "supplement", image: supplementJambon },
+  { id: "oeufs", name: "Œufs", price: 500, category: "supplement", image: supplementOeufs },
+  { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement", image: supplementHotdog },
   // Boissons
   { id: "coca", name: "Coca-Cola", price: 500, category: "boisson" },
   { id: "sprite", name: "Sprite", price: 500, category: "boisson" },
@@ -138,7 +149,7 @@ Merci!`;
           <img
             src={taco.image}
             alt={taco.name}
-            className="w-20 h-20 object-cover rounded-lg"
+            className="w-20 h-20 object-cover object-center rounded-lg"
           />
           <div className="flex-1">
             <h3 className="font-bold text-foreground">{taco.name}</h3>
@@ -223,22 +234,27 @@ Merci!`;
           </div>
         </div>
 
-        {/* Supplements */}
+        {/* Supplements with images */}
         <div>
           <h4 className="font-bold mb-3 text-primary">Suppléments</h4>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
             {supplementItems.map((supplement) => (
               <div
                 key={supplement.id}
-                className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                className="flex flex-col items-center p-3 bg-muted rounded-lg"
               >
-                <div>
-                  <span className="font-medium">{supplement.name}</span>
-                  <span className="text-muted-foreground text-sm ml-2">
-                    +{supplement.price} FCFA
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
+                {supplement.image && (
+                  <img
+                    src={supplement.image}
+                    alt={supplement.name}
+                    className="w-12 h-12 object-contain mb-2"
+                  />
+                )}
+                <span className="font-medium text-sm text-center">{supplement.name}</span>
+                <span className="text-muted-foreground text-xs">
+                  +{supplement.price} FCFA
+                </span>
+                <div className="flex items-center gap-2 mt-2">
                   <button
                     onClick={() => handleSupplementChange(supplement.id, -1)}
                     className="bg-card p-1.5 rounded-full hover:bg-accent transition-colors"

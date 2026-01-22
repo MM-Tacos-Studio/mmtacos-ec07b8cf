@@ -20,7 +20,7 @@ const TacoCard = ({ name, description, price, image, onClick }: TacoCardProps) =
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
         />
         {/* Cart Button */}
         <button
