@@ -8,6 +8,7 @@ import TacosSection from "@/components/TacosSection";
 import PromoBanner from "@/components/PromoBanner";
 import DrinksSection from "@/components/DrinksSection";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import mmKfcBox from "@/assets/mm-kfc-box.jpeg";
 
@@ -48,6 +49,9 @@ const Index = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 };
