@@ -20,14 +20,15 @@ const TacoCard = ({ name, description, price, image, onClick }: TacoCardProps) =
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
         />
-        {/* Cart Button - Duolingo style bounce */}
+        {/* Cart Button - Enhanced Duolingo style */}
         <button
-          className="absolute top-3 right-3 bg-primary text-primary-foreground p-2.5 rounded-full shadow-lg 
-            hover:scale-110 active:scale-95 transition-all duration-150
-            hover:shadow-[0_6px_0_0] hover:shadow-primary/50 hover:-translate-y-0.5
-            active:shadow-none active:translate-y-0"
+          className="absolute top-3 right-3 bg-primary text-primary-foreground p-2.5 rounded-full 
+            shadow-[0_4px_0_0_hsl(var(--primary)/0.7)] 
+            hover:shadow-[0_6px_0_0_hsl(var(--primary)/0.7)] hover:-translate-y-0.5
+            active:shadow-[0_1px_0_0_hsl(var(--primary)/0.7)] active:translate-y-1
+            transition-all duration-100 ease-out"
           onClick={(e) => {
             e.stopPropagation();
             onClick();

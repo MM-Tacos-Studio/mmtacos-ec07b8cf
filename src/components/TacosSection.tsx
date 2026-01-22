@@ -78,16 +78,6 @@ const tacos: Taco[] = [
     ],
   },
   {
-    id: "beef",
-    name: "Tacos Beef",
-    description: "Corned-beef grillé, sauce fromagère, frites croustillantes",
-    price: 4000,
-    image: tacosCorNedBeef,
-    sizes: [
-      { name: "M", price: 4000 },
-    ],
-  },
-  {
     id: "pane-miel",
     name: "Tacos Pané Miel",
     description: "Au choix viande ou poulet, sauce fromagère, frites, pané, miel",
