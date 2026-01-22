@@ -38,7 +38,11 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
               <div className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
                 <a
                   href="#tacos"
-                  className="bg-primary text-primary-foreground px-8 py-4 rounded-lg font-bold text-lg hover:opacity-90 transition-opacity inline-block"
+                  className="bg-primary text-primary-foreground px-8 py-4 rounded-lg font-bold text-lg 
+                    inline-block shadow-[0_4px_0_0] shadow-primary/60
+                    hover:-translate-y-0.5 hover:shadow-[0_6px_0_0] hover:shadow-primary/60
+                    active:translate-y-0 active:shadow-none
+                    transition-all duration-150"
                 >
                   Voir le Menu
                 </a>
@@ -66,7 +70,11 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
               />
               <button
                 type="submit"
-                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium 
+                  shadow-[0_3px_0_0] shadow-primary/60
+                  hover:-translate-y-0.5 hover:shadow-[0_4px_0_0]
+                  active:translate-y-0 active:shadow-none
+                  transition-all duration-150"
               >
                 Rechercher
               </button>

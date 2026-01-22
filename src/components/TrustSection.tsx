@@ -1,52 +1,42 @@
-import { Truck, Award, Users, Star } from "lucide-react";
+import { Zap, Shield, Heart } from "lucide-react";
 
 const TrustSection = () => {
   const trustItems = [
     {
-      icon: Truck,
-      text: "Livraison rapide à Bamako de 9h à 4h du matin",
+      icon: Zap,
+      title: "Livraison Express",
+      text: "De 9h à 4h du matin à Bamako",
     },
     {
-      icon: Award,
-      text: "Tacos de qualité",
+      icon: Shield,
+      title: "Qualité Premium",
+      text: "Ingrédients frais sélectionnés",
     },
     {
-      icon: Users,
-      text: "Déjà +800 clients satisfaits",
+      icon: Heart,
+      title: "+800 Clients",
+      text: "Satisfaits et fidèles",
     },
   ];
 
   return (
-    <section className="py-12 bg-muted">
+    <section className="py-10 bg-foreground">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="flex flex-wrap justify-center gap-8 md:gap-16">
           {trustItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-center gap-4 p-4 bg-card rounded-xl shadow-card"
+              className="flex items-center gap-3 text-primary-foreground"
             >
-              <div className="bg-primary/10 p-3 rounded-full">
-                <item.icon className="h-6 w-6 text-primary" />
+              <div className="bg-primary p-2 rounded-lg">
+                <item.icon className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-medium text-foreground">✔ {item.text}</span>
+              <div>
+                <p className="font-bold text-sm">{item.title}</p>
+                <p className="text-xs opacity-70">{item.text}</p>
+              </div>
             </div>
           ))}
-        </div>
-
-        {/* Google Reviews Link */}
-        <div className="text-center">
-          <a
-            href="https://www.google.com/maps/place/Magnambougou,+Bamako,+Mali"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-card px-6 py-3 rounded-xl shadow-card hover:shadow-hover transition-all group"
-          >
-            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-            <span className="font-medium text-foreground group-hover:text-primary transition-colors">
-              Voir nos avis sur Google Maps
-            </span>
-            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-          </a>
         </div>
       </div>
     </section>

@@ -28,9 +28,6 @@ const Index = () => {
       {/* Hero Section with Search */}
       <HeroSection onSearch={setSearchQuery} />
 
-      {/* Trust Section */}
-      <TrustSection />
-
       {/* Tacos Section */}
       <TacosSection searchQuery={searchQuery} />
 
@@ -45,6 +42,9 @@ const Index = () => {
 
       {/* Drinks & Supplements Section */}
       <DrinksSection />
+
+      {/* Trust Section - Before Footer */}
+      <TrustSection />
 
       {/* Footer */}
       <Footer />
