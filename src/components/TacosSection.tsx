@@ -2,56 +2,173 @@ import { useState } from "react";
 import TacoCard from "./TacoCard";
 import OrderModal from "./OrderModal";
 
-import tacosSaumon from "@/assets/tacos-saumon.jpeg";
+import tacosViande from "@/assets/tacos-viande-new.jpeg";
+import tacosPoulet from "@/assets/tacos-poulet.jpeg";
+import tacosMix from "@/assets/tacos-mix.jpeg";
+import tacosKfc from "@/assets/tacos-kfc.jpeg";
+import tacosCordonBleu from "@/assets/tacos-cordon-bleu.jpeg";
+import tacosHotdog from "@/assets/tacos-hotdog-new.jpeg";
+import tacosMerguez from "@/assets/tacos-merguez.jpeg";
 import tacosCrevettes from "@/assets/tacos-crevettes.jpeg";
-import tacosViande from "@/assets/tacos-viande.jpeg";
-import tacosHotdog from "@/assets/tacos-hotdog.jpeg";
-import tacosCrevettes2 from "@/assets/tacos-crevettes-2.jpeg";
+import tacosSaumon from "@/assets/tacos-saumon-new.jpeg";
+import tacosCorNedBeef from "@/assets/tacos-corned-beef.jpeg";
+import tacosPaneMiel from "@/assets/tacos-pane-miel.jpeg";
 
 interface TacosSectionProps {
   searchQuery: string;
 }
 
-const tacos = [
-  {
-    id: "saumon",
-    name: "Tacos Saumon",
-    description: "Délicieux tacos grillé avec du saumon frais, sauce fromagère et frites croustillantes",
-    price: 7000,
-    image: tacosSaumon,
-  },
-  {
-    id: "crevettes",
-    name: "Tacos Crevettes",
-    description: "Tacos aux crevettes fraîches avec sauce spéciale maison et fromage fondant",
-    price: 8500,
-    image: tacosCrevettes,
-  },
-  {
-    id: "crevettes-menu",
-    name: "Tacos Crevettes Menu",
-    description: "Tacos crevettes avec frites et boisson incluses",
-    price: 7500,
-    image: tacosCrevettes2,
-  },
+export interface TacoSize {
+  name: string;
+  price: number;
+}
+
+export interface Taco {
+  id: string;
+  name: string;
+  description: string;
+  price: number; // Prix de base (taille M)
+  image: string;
+  sizes?: TacoSize[];
+  requiresMeatChoice?: boolean; // Pour Pané Miel
+}
+
+const tacos: Taco[] = [
   {
     id: "viande",
     name: "Tacos Viande",
-    description: "Tacos classique avec viande hachée savoureuse, fromage et sauce maison",
-    price: 5000,
+    description: "Viande hachée, sauce fromagère, frites croustillantes",
+    price: 4000,
     image: tacosViande,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
+  },
+  {
+    id: "poulet",
+    name: "Tacos Poulet",
+    description: "Poulet, sauce fromagère, frites croustillantes",
+    price: 4000,
+    image: tacosPoulet,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
+  },
+  {
+    id: "mixte",
+    name: "Tacos Mixte",
+    description: "Viande et poulet, sauce fromagère, frites croustillantes",
+    price: 4000,
+    image: tacosMix,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
+  },
+  {
+    id: "kfc",
+    name: "Tacos KFC",
+    description: "KFC, sauce fromagère, frites croustillantes",
+    price: 5000,
+    image: tacosKfc,
+    sizes: [
+      { name: "M", price: 5000 },
+      { name: "XL", price: 8000 },
+    ],
+  },
+  {
+    id: "beef",
+    name: "Tacos Beef",
+    description: "Corned-beef grillé, sauce fromagère, frites croustillantes",
+    price: 4000,
+    image: tacosCorNedBeef,
+    sizes: [
+      { name: "M", price: 4000 },
+    ],
+  },
+  {
+    id: "pane-miel",
+    name: "Tacos Pané Miel",
+    description: "Au choix viande ou poulet, sauce fromagère, frites, pané, miel",
+    price: 5500,
+    image: tacosPaneMiel,
+    sizes: [
+      { name: "M", price: 5500 },
+    ],
+    requiresMeatChoice: true,
+  },
+  {
+    id: "cordon-bleu",
+    name: "Tacos Cordon Bleu",
+    description: "Cordon bleu, sauce fromagère, frites croustillantes",
+    price: 5000,
+    image: tacosCordonBleu,
+    sizes: [
+      { name: "M", price: 5000 },
+      { name: "XL", price: 6500 },
+    ],
   },
   {
     id: "hotdog",
     name: "Tacos Hotdog",
-    description: "Original tacos avec saucisse hotdog, fromage coulant et frites",
-    price: 5000,
+    description: "Hotdog poulet, sauce fromagère, frites croustillantes",
+    price: 4000,
     image: tacosHotdog,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
+  },
+  {
+    id: "merguez",
+    name: "Tacos Merguez",
+    description: "Merguez, sauce fromagère, frites croustillantes",
+    price: 4000,
+    image: tacosMerguez,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
+  },
+  {
+    id: "crevettes",
+    name: "Tacos Crevettes",
+    description: "Crevettes, sauce fromagère, frites croustillantes",
+    price: 7500,
+    image: tacosCrevettes,
+    sizes: [
+      { name: "M", price: 7500 },
+      { name: "XL", price: 12500 },
+    ],
+  },
+  {
+    id: "saumon",
+    name: "Tacos Saumon",
+    description: "Saumon, sauce fromagère, frites croustillantes",
+    price: 6000,
+    image: tacosSaumon,
+    sizes: [
+      { name: "M", price: 6000 },
+      { name: "XL", price: 8000 },
+    ],
+  },
+  {
+    id: "corned-beef",
+    name: "Tacos Corned-Beef",
+    description: "Corned-beef, sauce fromagère, frites croustillantes",
+    price: 4000,
+    image: tacosCorNedBeef,
+    sizes: [
+      { name: "M", price: 4000 },
+      { name: "XL", price: 6500 },
+    ],
   },
 ];
 
 const TacosSection = ({ searchQuery }: TacosSectionProps) => {
-  const [selectedTaco, setSelectedTaco] = useState<typeof tacos[0] | null>(null);
+  const [selectedTaco, setSelectedTaco] = useState<Taco | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredTacos = tacos.filter(
@@ -60,7 +177,7 @@ const TacosSection = ({ searchQuery }: TacosSectionProps) => {
       taco.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleTacoClick = (taco: typeof tacos[0]) => {
+  const handleTacoClick = (taco: Taco) => {
     setSelectedTaco(taco);
     setIsModalOpen(true);
   };
