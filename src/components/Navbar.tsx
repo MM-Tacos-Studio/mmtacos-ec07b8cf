@@ -21,8 +21,8 @@ const Navbar = () => {
           {/* Logo */}
           <a href="#accueil" className="flex items-center gap-2">
             <img src={logo} alt="MM Tacos" className="h-12 w-auto" />
-            <span className="font-extrabold text-xl text-primary tracking-tight" style={{ fontFamily: "'Arial Black', sans-serif" }}>
-              MM<span className="text-foreground">'</span>TACOS
+            <span className="font-extrabold text-xl tracking-tight" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+              <span className="text-primary">MM</span><span className="text-foreground">TACOS</span>
             </span>
           </a>
 
