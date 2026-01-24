@@ -100,7 +100,7 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
           <div className="container mx-auto px-4">
             <div className="max-w-lg text-primary-foreground text-center md:text-left mx-auto md:mx-0">
               <h1 className="text-3xl md:text-5xl font-extrabold mb-3 animate-fade-in drop-shadow-lg">
-                Les meilleurs French Tacos de Bamako
+                Les meilleurs Tacos de Bamako
               </h1>
               <p className="text-base md:text-xl opacity-90 mb-6 animate-fade-in drop-shadow-md" style={{ animationDelay: "0.1s" }}>
                 Savourez l'authentique goût français • Livraison 9h-4h
