@@ -10,10 +10,10 @@ interface HeroSectionProps {
 }
 
 const heroImages = [
+  { src: heroTacos3, alt: "Menu complet MM Tacos" },
   { src: heroBanner, alt: "Délicieux tacos MM Tacos" },
   { src: heroTacos1, alt: "Tacos grillé croustillant MM Tacos" },
   { src: heroTacos2, alt: "Commande MM Tacos avec frites et poulet" },
-  { src: heroTacos3, alt: "Menu complet MM Tacos" },
 ];
 
 const HeroSection = ({ onSearch }: HeroSectionProps) => {
