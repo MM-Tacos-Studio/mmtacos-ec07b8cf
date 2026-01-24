@@ -54,7 +54,7 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
   return (
     <section id="accueil">
       {/* Hero Carousel - Full Screen on Mobile */}
-      <div className="relative h-[85vh] md:h-[70vh] overflow-hidden">
+      <div className="relative h-[90vh] md:h-[75vh] overflow-hidden">
         {/* Images */}
         {heroImages.map((image, index) => (
           <div
@@ -66,7 +66,8 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
             <img
               src={image.src}
               alt={image.alt}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center md:object-center"
+              style={{ objectPosition: "center 30%" }}
             />
           </div>
         ))}

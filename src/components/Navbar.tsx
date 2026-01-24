@@ -19,8 +19,11 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="#accueil" className="flex items-center">
+          <a href="#accueil" className="flex items-center gap-2">
             <img src={logo} alt="MM Tacos" className="h-12 w-auto" />
+            <span className="font-extrabold text-xl text-primary tracking-tight" style={{ fontFamily: "'Arial Black', sans-serif" }}>
+              MM<span className="text-foreground">'</span>TACOS
+            </span>
           </a>
 
           {/* Desktop Navigation */}
