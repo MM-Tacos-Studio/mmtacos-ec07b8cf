@@ -23,11 +23,11 @@ const Index = () => {
       {/* Navbar */}
       <Navbar />
 
-      {/* Promo Marquee Banner */}
-      <PromoMarquee />
-
       {/* Hero Section with Search */}
       <HeroSection onSearch={setSearchQuery} />
+
+      {/* Promo Marquee Banner - After Search */}
+      <PromoMarquee />
 
       {/* Tacos Section */}
       <TacosSection searchQuery={searchQuery} />

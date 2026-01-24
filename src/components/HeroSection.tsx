@@ -100,10 +100,10 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
           <div className="container mx-auto px-4">
             <div className="max-w-lg text-primary-foreground text-center md:text-left mx-auto md:mx-0">
               <h1 className="text-3xl md:text-5xl font-extrabold mb-3 animate-fade-in drop-shadow-lg">
-                Tu vas charger sur lequel ?
+                Les meilleurs French Tacos de Bamako
               </h1>
               <p className="text-base md:text-xl opacity-90 mb-6 animate-fade-in drop-shadow-md" style={{ animationDelay: "0.1s" }}>
-                Les meilleurs French Tacos de Bamako • Livraison 9h-4h
+                Savourez l'authentique goût français • Livraison 9h-4h
               </p>
               <div className="animate-fade-in flex flex-col sm:flex-row gap-3 justify-center md:justify-start" style={{ animationDelay: "0.2s" }}>
                 <a
