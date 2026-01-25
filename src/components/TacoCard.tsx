@@ -16,11 +16,11 @@ const TacoCard = ({ name, description, price, image, onClick }: TacoCardProps) =
       className="bg-card rounded-xl overflow-hidden shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer group"
     >
       {/* Image Container */}
-      <div className="relative overflow-hidden bg-accent">
+      <div className="relative overflow-hidden bg-accent md:aspect-[4/3]">
         <img
           src={image}
           alt={name}
-          className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-auto md:h-full object-contain md:object-cover md:object-center group-hover:scale-105 transition-transform duration-300"
         />
         {/* Cart Button - Enhanced Duolingo style */}
         <button

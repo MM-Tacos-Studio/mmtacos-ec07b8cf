@@ -117,11 +117,11 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
     const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
     const deliveryText = deliveryType === "livraison" 
       ? `Livraison à ${deliveryAddress.trim()}` 
-      : "Sur place";
+      : "Je viendrais récupérer";
 
-    const supplementsText = supplementsList ? `\nSuppléments: ${supplementsList}` : "";
+    const supplementsText = supplementsList ? `\n\nSuppléments : ${supplementsList}` : "";
 
-    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n${deliveryText}\nTotal: ${calculateTotal().toLocaleString()} FCFA`;
+    const message = `Bonjour je voudrais commander :\n\n${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n\n${deliveryText}\n\nTotal : ${calculateTotal().toLocaleString()} FCFA\n\nMerci !`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -320,7 +320,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
 
         {/* Delivery Type */}
         <div className="p-4 bg-muted rounded-lg">
-          <span className="font-bold text-primary mb-3 block">Livraison ou sur place ? *</span>
+          <span className="font-bold text-primary mb-3 block">Livraison ou je viendrais récupérer ? *</span>
           <div className="flex gap-3">
             <button
               onClick={() => setDeliveryType("livraison")}
@@ -334,13 +334,13 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
             </button>
             <button
               onClick={() => setDeliveryType("emporter")}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+              className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all text-sm ${
                 deliveryType === "emporter"
                   ? "bg-primary text-primary-foreground"
                   : "bg-card text-foreground hover:bg-accent"
               }`}
             >
-              Sur place
+              Je viendrais récupérer
             </button>
           </div>
           {deliveryType === "livraison" && (
