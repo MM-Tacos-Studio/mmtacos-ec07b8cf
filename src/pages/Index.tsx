@@ -10,7 +10,7 @@ import DrinksSection from "@/components/DrinksSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 
-import mmKfcBox from "@/assets/mm-kfc-box.jpeg";
+import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +34,7 @@ const Index = () => {
 
       {/* Promo Banner - MM'KFC */}
       <PromoBanner
-        image={mmKfcBox}
+        image={promoBanner}
         title="Poulet Pané Croustillant"
         subtitle="MM'KFC - Un plaisir irrésistible à chaque bouchée!"
         buttonText="Nous Trouver"
