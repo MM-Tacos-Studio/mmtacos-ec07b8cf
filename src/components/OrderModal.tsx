@@ -113,7 +113,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
       })
       .join(", ");
 
-    const sizeName = selectedSize ? ` ${selectedSize.name}` : "";
+    const sizeName = selectedSize ? ` Taille ${selectedSize.name}` : "";
     const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
     const deliveryText = deliveryType === "livraison" 
       ? `Livraison à ${deliveryAddress.trim()}` 
