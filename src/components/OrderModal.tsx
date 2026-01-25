@@ -117,11 +117,11 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
     const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
     const deliveryText = deliveryType === "livraison" 
       ? `Livraison à ${deliveryAddress.trim()}` 
-      : "Je viens récupérer mon tacos";
+      : "Sur place";
 
-    const supplementsText = supplementsList ? ` | Suppléments: ${supplementsList}` : "";
+    const supplementsText = supplementsList ? `\nSuppléments: ${supplementsList}` : "";
 
-    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText} | ${deliveryText} | Total: ${calculateTotal().toLocaleString()} FCFA`;
+    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n${deliveryText}\nTotal: ${calculateTotal().toLocaleString()} FCFA`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -320,7 +320,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
 
         {/* Delivery Type */}
         <div className="p-4 bg-muted rounded-lg">
-          <span className="font-bold text-primary mb-3 block">Livraison ou je viens récupérer mon tacos ? *</span>
+          <span className="font-bold text-primary mb-3 block">Livraison ou sur place ? *</span>
           <div className="flex gap-3">
             <button
               onClick={() => setDeliveryType("livraison")}
@@ -340,7 +340,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
                   : "bg-card text-foreground hover:bg-accent"
               }`}
             >
-              Je récupère
+              Sur place
             </button>
           </div>
           {deliveryType === "livraison" && (

@@ -13,6 +13,7 @@ import tacosCrevettes from "@/assets/tacos-crevettes-2.jpeg";
 import tacosSaumon from "@/assets/tacos-saumon-2.jpeg";
 import tacosCorNedBeef from "@/assets/tacos-corned-beef.jpeg";
 import tacosPaneMiel from "@/assets/tacos-pane-miel.jpeg";
+import kfcBox from "@/assets/mm-kfc-box.jpeg";
 interface TacosSectionProps {
   searchQuery: string;
 }
@@ -154,6 +155,13 @@ const tacos: Taco[] = [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
     ],
+  },
+  {
+    id: "kfc-box",
+    name: "MM'KFC Box",
+    description: "3 pièces de poulet croustillant + frites + boisson",
+    price: 5000,
+    image: kfcBox,
   },
 ];
 
