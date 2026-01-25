@@ -43,12 +43,8 @@ const supplements: Supplement[] = [
   { id: "oeufs", name: "Œufs", price: 500, category: "supplement", image: supplementOeufs },
   { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement", image: supplementHotdog },
   // Boissons
-  { id: "coca", name: "Coca-Cola", price: 500, category: "boisson" },
-  { id: "sprite", name: "Sprite", price: 500, category: "boisson" },
-  { id: "fanta", name: "Fanta Orange", price: 500, category: "boisson" },
-  { id: "eau", name: "Eau Minérale", price: 300, category: "boisson" },
-  { id: "jus-orange", name: "Jus d'Orange", price: 700, category: "boisson" },
-  { id: "jus-mangue", name: "Jus de Mangue", price: 700, category: "boisson" },
+  { id: "boisson", name: "Boisson", price: 500, category: "boisson" },
+  { id: "menthe-lait", name: "Menthe au lait", price: 500, category: "boisson" },
 ];
 
 const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
@@ -56,6 +52,8 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<TacoSize | null>(null);
   const [meatChoice, setMeatChoice] = useState<"viande" | "poulet" | null>(null);
+  const [deliveryType, setDeliveryType] = useState<"livraison" | "emporter" | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   // Reset state when modal opens with new taco
   useEffect(() => {
@@ -64,6 +62,8 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
       setQuantity(1);
       setSelectedSize(taco.sizes?.[0] || null);
       setMeatChoice(null);
+      setDeliveryType(null);
+      setDeliveryAddress("");
     }
   }, [taco, isOpen]);
 
@@ -94,8 +94,14 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
   };
 
   const handleOrder = () => {
-    // Validation pour Pané Miel
+    // Validation pour Pané Miel et type de commande
     if (taco.requiresMeatChoice && !meatChoice) {
+      return;
+    }
+    if (!deliveryType) {
+      return;
+    }
+    if (deliveryType === "livraison" && !deliveryAddress.trim()) {
       return;
     }
 
@@ -107,20 +113,15 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
       })
       .join(", ");
 
-    const sizeName = selectedSize ? ` (Taille ${selectedSize.name})` : "";
-    const meatText = meatChoice ? ` - ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
-    const basePrice = selectedSize?.price || taco.price;
+    const sizeName = selectedSize ? ` ${selectedSize.name}` : "";
+    const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
+    const deliveryText = deliveryType === "livraison" 
+      ? `Livraison - ${deliveryAddress.trim()}` 
+      : "Je viens récupérer";
 
-    const message = `Bonjour! Je voudrais commander:
-    
-🌮 ${quantity}x ${taco.name}${sizeName}${meatText} (${basePrice.toLocaleString()} FCFA)
-${supplementsList ? `➕ Suppléments: ${supplementsList}` : ""}
+    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsList ? ` + ${supplementsList}` : ""} | ${deliveryText} | Total: ${calculateTotal().toLocaleString()} FCFA`;
 
-💰 Total: ${calculateTotal().toLocaleString()} FCFA
-
-Merci!`;
-
-    const whatsappUrl = `https://wa.me/22384437961?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
     handleClose();
   };
@@ -130,6 +131,8 @@ Merci!`;
     setQuantity(1);
     setSelectedSize(taco?.sizes?.[0] || null);
     setMeatChoice(null);
+    setDeliveryType(null);
+    setDeliveryAddress("");
     onClose();
   };
 
@@ -313,6 +316,48 @@ Merci!`;
           </div>
         </div>
 
+        {/* Delivery Type */}
+        <div className="p-4 bg-muted rounded-lg">
+          <span className="font-bold text-primary mb-3 block">Livraison ou je viens récupérer mon tacos *</span>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setDeliveryType("livraison")}
+              className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+                deliveryType === "livraison"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-foreground hover:bg-accent"
+              }`}
+            >
+              Livraison
+            </button>
+            <button
+              onClick={() => setDeliveryType("emporter")}
+              className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
+                deliveryType === "emporter"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-foreground hover:bg-accent"
+              }`}
+            >
+              Je récupère
+            </button>
+          </div>
+          {deliveryType === "livraison" && (
+            <input
+              type="text"
+              placeholder="Votre adresse de livraison..."
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              className="w-full mt-3 p-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
+            />
+          )}
+          {!deliveryType && (
+            <p className="text-destructive text-sm mt-2">* Veuillez choisir</p>
+          )}
+          {deliveryType === "livraison" && !deliveryAddress.trim() && (
+            <p className="text-destructive text-sm mt-2">* Veuillez entrer votre adresse</p>
+          )}
+        </div>
+
         {/* Total & Order Button */}
         <div className="border-t border-border pt-4 mt-4">
           <div className="flex items-center justify-between mb-4">
@@ -323,7 +368,7 @@ Merci!`;
           </div>
           <button
             onClick={handleOrder}
-            disabled={taco.requiresMeatChoice && !meatChoice}
+            disabled={(taco.requiresMeatChoice && !meatChoice) || !deliveryType || (deliveryType === "livraison" && !deliveryAddress.trim())}
             className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
               shadow-[0_4px_0_0] shadow-[#1da851]
               hover:-translate-y-0.5 hover:shadow-[0_6px_0_0] hover:shadow-[#1da851]

@@ -1,19 +1,6 @@
-import drinkCoca from "@/assets/drink-coca.png";
-import drink7up from "@/assets/drink-7up.png";
-import drinkDjino from "@/assets/drink-djino.png";
-import drinkLimonade from "@/assets/drink-limonade.png";
-import drinkPresseaMangue from "@/assets/drink-pressea-mangue.png";
-import drinkPresseaCoco from "@/assets/drink-pressea-coco.png";
-import drinkKirene from "@/assets/drink-kirene.png";
-
 const drinks = [
-  { id: "coca", name: "Coca-Cola 33cl", price: 500, image: drinkCoca },
-  { id: "7up", name: "7UP Canette", price: 750, image: drink7up },
-  { id: "djino", name: "D'jino Cocktail de Fruits", price: 750, image: drinkDjino },
-  { id: "limonade", name: "Limonade Citron Vert", price: 500, image: drinkLimonade },
-  { id: "pressea-mangue", name: "Pressea Fresh Mangue", price: 750, image: drinkPresseaMangue },
-  { id: "pressea-coco", name: "Pressea Fresh Mangue Coco", price: 750, image: drinkPresseaCoco },
-  { id: "kirene", name: "Eau Kirène 50cl", price: 500, image: drinkKirene },
+  { id: "boisson", name: "Boisson", price: 500 },
+  { id: "menthe-lait", name: "Menthe au lait", price: 500 },
 ];
 
 const DrinksSection = () => {
@@ -32,23 +19,13 @@ const DrinksSection = () => {
           {drinks.map((drink, index) => (
             <div
               key={drink.id}
-              className="bg-card rounded-xl shadow-card hover:shadow-hover transition-all duration-300 animate-fade-in overflow-hidden"
+              className="bg-card rounded-xl shadow-card hover:shadow-hover transition-all duration-300 animate-fade-in overflow-hidden p-6"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              {/* Image */}
-              <div className="h-40 bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center p-4">
-                <img 
-                  src={drink.image} 
-                  alt={drink.name}
-                  className="h-full w-auto object-contain"
-                />
-              </div>
-              <div className="p-4">
-                <p className="text-lg font-extrabold text-primary mb-1">
-                  {drink.price.toLocaleString()} FCFA
-                </p>
-                <p className="text-sm font-medium text-foreground">{drink.name}</p>
-              </div>
+              <p className="text-lg font-extrabold text-primary mb-1">
+                {drink.price.toLocaleString()} FCFA
+              </p>
+              <p className="text-sm font-medium text-foreground">{drink.name}</p>
             </div>
           ))}
         </div>

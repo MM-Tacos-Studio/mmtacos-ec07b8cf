@@ -23,14 +23,14 @@ const Footer = () => {
             <h4 className="font-bold text-lg mb-4">Contact</h4>
             <div className="space-y-3">
               <a
-                href="tel:+22384437961"
+                href="tel:+22373360131"
                 className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity"
               >
                 <Phone className="h-5 w-5 text-primary" />
-                <span>+223 84 43 79 61</span>
+                <span>+223 73 36 01 31</span>
               </a>
               <a
-                href="https://wa.me/22384437961"
+                href="https://wa.me/22373360131"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity"
