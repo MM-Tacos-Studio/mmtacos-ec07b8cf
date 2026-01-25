@@ -44,7 +44,7 @@ const supplements: Supplement[] = [
   { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement", image: supplementHotdog },
   // Boissons
   { id: "boisson", name: "Boisson", price: 500, category: "boisson" },
-  { id: "menthe-lait", name: "Menthe au lait", price: 500, category: "boisson" },
+  { id: "menthe-lait", name: "Menthe au lait", price: 1000, category: "boisson" },
 ];
 
 const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
@@ -116,10 +116,12 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
     const sizeName = selectedSize ? ` ${selectedSize.name}` : "";
     const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
     const deliveryText = deliveryType === "livraison" 
-      ? `Livraison - ${deliveryAddress.trim()}` 
-      : "Je viens récupérer";
+      ? `Livraison à ${deliveryAddress.trim()}` 
+      : "Je viens récupérer mon tacos";
 
-    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsList ? ` + ${supplementsList}` : ""} | ${deliveryText} | Total: ${calculateTotal().toLocaleString()} FCFA`;
+    const supplementsText = supplementsList ? ` | Suppléments: ${supplementsList}` : "";
+
+    const message = `${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText} | ${deliveryText} | Total: ${calculateTotal().toLocaleString()} FCFA`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -318,7 +320,7 @@ const OrderModal = ({ isOpen, onClose, taco }: OrderModalProps) => {
 
         {/* Delivery Type */}
         <div className="p-4 bg-muted rounded-lg">
-          <span className="font-bold text-primary mb-3 block">Livraison ou je viens récupérer mon tacos *</span>
+          <span className="font-bold text-primary mb-3 block">Livraison ou je viens récupérer mon tacos ? *</span>
           <div className="flex gap-3">
             <button
               onClick={() => setDeliveryType("livraison")}

@@ -1,6 +1,9 @@
+import drinkGeneric from "@/assets/drink-generic.png";
+import drinkMentheLait from "@/assets/drink-menthe-lait.png";
+
 const drinks = [
-  { id: "boisson", name: "Boisson", price: 500 },
-  { id: "menthe-lait", name: "Menthe au lait", price: 500 },
+  { id: "boisson", name: "Boisson", price: 500, image: drinkGeneric },
+  { id: "menthe-lait", name: "Menthe au lait", price: 1000, image: drinkMentheLait },
 ];
 
 const DrinksSection = () => {
@@ -19,13 +22,22 @@ const DrinksSection = () => {
           {drinks.map((drink, index) => (
             <div
               key={drink.id}
-              className="bg-card rounded-xl shadow-card hover:shadow-hover transition-all duration-300 animate-fade-in overflow-hidden p-6"
+              className="bg-card rounded-xl shadow-card hover:shadow-hover transition-all duration-300 animate-fade-in overflow-hidden"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <p className="text-lg font-extrabold text-primary mb-1">
-                {drink.price.toLocaleString()} FCFA
-              </p>
-              <p className="text-sm font-medium text-foreground">{drink.name}</p>
+              <div className="aspect-square overflow-hidden">
+                <img
+                  src={drink.image}
+                  alt={drink.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <p className="text-lg font-extrabold text-primary mb-1">
+                  {drink.price.toLocaleString()} FCFA
+                </p>
+                <p className="text-sm font-medium text-foreground">{drink.name}</p>
+              </div>
             </div>
           ))}
         </div>
