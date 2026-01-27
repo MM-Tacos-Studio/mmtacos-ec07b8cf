@@ -8,6 +8,8 @@ const Navbar = () => {
   const navLinks = [
     { name: "Accueil", href: "#accueil" },
     { name: "Nos Tacos", href: "#tacos" },
+    { name: "Menu Familial", href: "#menu-familial" },
+    { name: "Menu Entreprise", href: "#menu-entreprise" },
     { name: "Boissons", href: "#boissons" },
     { name: "Contact", href: "#contact" },
   ];
