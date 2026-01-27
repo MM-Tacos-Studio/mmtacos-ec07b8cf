@@ -11,10 +11,10 @@ interface FamilyMenu {
   id: string;
   quantity: number;
   price: number;
-  originalPrice: number;
   bonus?: string;
   features: string[];
   popular?: boolean;
+  image: string;
 }
 
 interface MeatDistribution {
@@ -94,9 +94,6 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu }: FamilyMenuOrderModalPro
               {menu.price.toLocaleString()} FCFA
             </span>
           </div>
-          <p className="text-sm text-muted-foreground line-through">
-            au lieu de {menu.originalPrice.toLocaleString()} FCFA
-          </p>
           {menu.bonus && (
             <div className="mt-2 inline-flex items-center gap-1 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
               <Gift className="h-3 w-3" />
