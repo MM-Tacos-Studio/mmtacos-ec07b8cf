@@ -1,21 +1,69 @@
 import { useState } from "react";
-import { Building2, MessageCircle, TrendingDown } from "lucide-react";
+import { Building2, MessageCircle, Users, Check } from "lucide-react";
 import EnterpriseMenuOrderModal from "./EnterpriseMenuOrderModal";
+
+import enterpriseImg1 from "@/assets/enterprise-menu-1.jpeg";
+import enterpriseImg2 from "@/assets/enterprise-menu-2.jpeg";
+import enterpriseImg3 from "@/assets/enterprise-menu-3.jpeg";
 
 interface EnterpriseMenu {
   id: string;
   quantity: number;
   price: number;
   pricePerMenu: number;
+  image: string;
+  features: string[];
 }
 
 const enterpriseMenus: EnterpriseMenu[] = [
-  { id: "enterprise-20", quantity: 20, price: 88000, pricePerMenu: 4400 },
-  { id: "enterprise-25", quantity: 25, price: 108000, pricePerMenu: 4320 },
-  { id: "enterprise-30", quantity: 30, price: 129000, pricePerMenu: 4300 },
-  { id: "enterprise-35", quantity: 35, price: 148000, pricePerMenu: 4229 },
-  { id: "enterprise-40", quantity: 40, price: 166000, pricePerMenu: 4150 },
-  { id: "enterprise-50", quantity: 50, price: 205000, pricePerMenu: 4100 },
+  { 
+    id: "enterprise-20", 
+    quantity: 20, 
+    price: 88000, 
+    pricePerMenu: 4400,
+    image: enterpriseImg1,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
+  { 
+    id: "enterprise-25", 
+    quantity: 25, 
+    price: 108000, 
+    pricePerMenu: 4320,
+    image: enterpriseImg1,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
+  { 
+    id: "enterprise-30", 
+    quantity: 30, 
+    price: 129000, 
+    pricePerMenu: 4300,
+    image: enterpriseImg2,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
+  { 
+    id: "enterprise-35", 
+    quantity: 35, 
+    price: 148000, 
+    pricePerMenu: 4229,
+    image: enterpriseImg2,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
+  { 
+    id: "enterprise-40", 
+    quantity: 40, 
+    price: 166000, 
+    pricePerMenu: 4150,
+    image: enterpriseImg3,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
+  { 
+    id: "enterprise-50", 
+    quantity: 50, 
+    price: 205000, 
+    pricePerMenu: 4100,
+    image: enterpriseImg3,
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+  },
 ];
 
 const EnterpriseMenuSection = () => {
@@ -43,67 +91,68 @@ const EnterpriseMenuSection = () => {
             À partir de 20 menus complets : <strong>Tacos + Frites + Boisson</strong>
           </p>
           <p className="text-primary font-bold mt-2">
-            Tacos viande ou poulet, sauce fromagère, frites à l'intérieur + accompagnement
+            Idéal pour séminaires, événements d'entreprise, célébrations
           </p>
         </div>
 
-        {/* Pricing Table */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-card rounded-2xl shadow-card overflow-hidden">
-            {/* Table Header */}
-            <div className="grid grid-cols-3 bg-primary text-primary-foreground font-bold text-center py-4">
-              <div>Quantité</div>
-              <div>Prix Total</div>
-              <div>Prix/Menu</div>
-            </div>
-
-            {/* Table Body */}
-            {enterpriseMenus.map((menu, index) => (
-              <div
-                key={menu.id}
-                className={`grid grid-cols-3 text-center py-4 items-center border-b border-border last:border-b-0 hover:bg-accent/50 transition-colors cursor-pointer animate-fade-in ${
-                  index % 2 === 0 ? "bg-background" : "bg-card"
-                }`}
-                style={{ animationDelay: `${index * 0.05}s` }}
-                onClick={() => handleMenuClick(menu)}
-              >
-                <div className="font-bold text-lg text-foreground">
-                  {menu.quantity} menus
-                </div>
-                <div className="font-extrabold text-primary text-lg">
-                  {menu.price.toLocaleString()} FCFA
-                </div>
-                <div className="flex items-center justify-center gap-1 text-green-600 font-medium">
-                  <TrendingDown className="h-4 w-4" />
-                  {menu.pricePerMenu.toLocaleString()} FCFA
+        {/* Menu Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {enterpriseMenus.map((menu, index) => (
+            <div
+              key={menu.id}
+              onClick={() => handleMenuClick(menu)}
+              className="relative bg-card rounded-2xl shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden cursor-pointer animate-fade-in group"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {/* Image */}
+              <div className="relative h-40 overflow-hidden">
+                <img
+                  src={menu.image}
+                  alt={`${menu.quantity} menus entreprise`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+                  <div>
+                    <div className="text-4xl font-extrabold text-white">
+                      {menu.quantity}
+                    </div>
+                    <div className="text-sm font-medium text-white/80">menus</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-extrabold text-white">
+                      {menu.price.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-white/80">FCFA</div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Quick Order Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-            {enterpriseMenus.map((menu, index) => (
-              <button
-                key={menu.id}
-                onClick={() => handleMenuClick(menu)}
-                className="bg-card hover:bg-accent border border-border rounded-xl p-4 transition-all duration-300 hover:shadow-hover animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="text-2xl font-extrabold text-primary mb-1">
-                  {menu.quantity}
-                </div>
-                <div className="text-sm text-muted-foreground mb-2">menus</div>
-                <div className="text-lg font-bold text-foreground">
-                  {menu.price.toLocaleString()} FCFA
-                </div>
-                <div className="flex items-center justify-center gap-2 mt-3 text-[#25D366] font-medium text-sm">
+              <div className="p-4">
+                {/* Features */}
+                <ul className="space-y-1 mb-4">
+                  {menu.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Check className="h-3 w-3 text-green-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Order Button */}
+                <button
+                  className="w-full bg-[#25D366] text-white py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 
+                    shadow-[0_3px_0_0] shadow-[#1da851]
+                    hover:-translate-y-0.5 hover:shadow-[0_5px_0_0] hover:shadow-[#1da851]
+                    active:translate-y-0 active:shadow-none
+                    transition-all duration-150 text-sm"
+                >
                   <MessageCircle className="h-4 w-4" />
                   Commander
-                </div>
-              </button>
-            ))}
-          </div>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Bottom Note */}

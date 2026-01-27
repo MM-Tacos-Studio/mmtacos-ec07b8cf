@@ -2,14 +2,19 @@ import { useState } from "react";
 import { Users, Gift, Truck, MessageCircle, Check } from "lucide-react";
 import FamilyMenuOrderModal from "./FamilyMenuOrderModal";
 
+import familyImg1 from "@/assets/family-menu-1.jpeg";
+import familyImg2 from "@/assets/family-menu-2.jpeg";
+import familyImg3 from "@/assets/family-menu-3.jpeg";
+import familyImg4 from "@/assets/family-menu-4.jpeg";
+
 interface FamilyMenu {
   id: string;
   quantity: number;
   price: number;
-  originalPrice: number;
   bonus?: string;
   features: string[];
   popular?: boolean;
+  image: string;
 }
 
 const familyMenus: FamilyMenu[] = [
@@ -17,19 +22,18 @@ const familyMenus: FamilyMenu[] = [
     id: "family-5",
     quantity: 5,
     price: 23500,
-    originalPrice: 25000,
     features: [
       "Tacos viande ou poulet au choix",
       "Sauce fromagère",
       "Frites à l'intérieur + accompagnement",
       "1 boisson par menu",
     ],
+    image: familyImg1,
   },
   {
     id: "family-10",
     quantity: 10,
     price: 46000,
-    originalPrice: 50000,
     bonus: "1 boisson offerte",
     features: [
       "Tacos viande ou poulet",
@@ -38,24 +42,24 @@ const familyMenus: FamilyMenu[] = [
       "1 boisson par menu",
     ],
     popular: true,
+    image: familyImg2,
   },
   {
     id: "family-15",
     quantity: 15,
     price: 68000,
-    originalPrice: 75000,
     features: [
       "1 Tacos viande ou poulet généreux",
       "Frites croustillantes",
       "Boisson fraîche",
       "Mélange possible viande & poulet",
     ],
+    image: familyImg3,
   },
   {
     id: "family-20",
     quantity: 20,
     price: 90000,
-    originalPrice: 100000,
     bonus: "2 boissons offertes",
     features: [
       "1 Tacos au choix (viande ou poulet)",
@@ -63,6 +67,7 @@ const familyMenus: FamilyMenu[] = [
       "Boisson",
       "Livraison possible selon zone",
     ],
+    image: familyImg4,
   },
 ];
 
@@ -105,50 +110,52 @@ const FamilyMenuSection = () => {
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              {/* Popular Badge */}
-              {menu.popular && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-lg text-sm font-bold">
-                  Populaire
-                </div>
-              )}
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={menu.image}
+                  alt={`${menu.quantity} menus`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Popular Badge */}
+                {menu.popular && (
+                  <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold">
+                    Populaire
+                  </div>
+                )}
+                {/* Bonus Badge */}
+                {menu.bonus && (
+                  <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                    <Gift className="h-3 w-3" />
+                    {menu.bonus}
+                  </div>
+                )}
+              </div>
 
-              {/* Bonus Badge */}
-              {menu.bonus && (
-                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                  <Gift className="h-3 w-3" />
-                  {menu.bonus}
-                </div>
-              )}
-
-              <div className="p-6">
+              <div className="p-5">
                 {/* Quantity Header */}
-                <div className="text-center mb-4 pt-4">
-                  <div className="text-5xl font-extrabold text-primary mb-1">
-                    {menu.quantity}
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="text-3xl font-extrabold text-primary">
+                      {menu.quantity}
+                    </div>
+                    <div className="text-sm font-bold text-foreground">
+                      MENUS
+                    </div>
                   </div>
-                  <div className="text-lg font-bold text-foreground">
-                    MENUS COMPLETS
-                  </div>
-                </div>
-
-                {/* Price */}
-                <div className="text-center mb-6">
-                  <div className="text-3xl font-extrabold text-foreground">
-                    {menu.price.toLocaleString()} <span className="text-lg">FCFA</span>
-                  </div>
-                  <div className="text-muted-foreground line-through text-sm">
-                    au lieu de {menu.originalPrice.toLocaleString()} FCFA
-                  </div>
-                  <div className="text-green-600 font-bold text-sm">
-                    Économie : {(menu.originalPrice - menu.price).toLocaleString()} FCFA
+                  <div className="text-right">
+                    <div className="text-2xl font-extrabold text-foreground">
+                      {menu.price.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-muted-foreground">FCFA</div>
                   </div>
                 </div>
 
                 {/* Features */}
-                <ul className="space-y-2 mb-6">
-                  {menu.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <ul className="space-y-1.5 mb-4">
+                  {menu.features.slice(0, 3).map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <Check className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
