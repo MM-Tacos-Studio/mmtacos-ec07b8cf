@@ -1,6 +1,6 @@
 const PromoMarquee = () => {
   const promos = [
-    "🔥 -1000 FCFA sur ta première commande (2 tacos minimum)",
+    "🎁 -1000 FCFA sur ta première commande (4 tacos minimum)",
     "🎁 2 Boissons offertes sur commande de plus de 15000 FCFA",
     "📦 Gardez 20 emballages et bénéficiez d'un Tacos gratuit!",
   ];
