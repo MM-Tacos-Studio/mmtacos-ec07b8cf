@@ -36,8 +36,28 @@
           serviceWorkerPath: "/OneSignalSDKWorker.js",
           serviceWorkerParam: { scope: "/" },
           allowLocalhostAsSecureOrigin: true,
-          // Force re-subscribe if token is stale
-          notifyButton: { enable: false },
+          // Enable the notification bell button
+          notifyButton: {
+            enable: true,
+            size: 'medium',
+            theme: 'default',
+            position: 'bottom-left',
+            showCredit: false,
+            text: {
+              'tip.state.unsubscribed': 'Activer les notifications',
+              'tip.state.subscribed': 'Notifications activées',
+              'tip.state.blocked': 'Notifications bloquées',
+              'message.prenotify': 'Cliquez pour recevoir nos offres',
+              'message.action.subscribed': 'Merci ! Vous recevrez nos offres.',
+              'message.action.resubscribed': 'Notifications réactivées',
+              'message.action.unsubscribed': 'Vous ne recevrez plus de notifications',
+              'dialog.main.title': 'Gérer les notifications',
+              'dialog.main.button.subscribe': 'S\'ABONNER',
+              'dialog.main.button.unsubscribe': 'SE DÉSABONNER',
+              'dialog.blocked.title': 'Débloquer les notifications',
+              'dialog.blocked.message': 'Suivez ces instructions pour autoriser les notifications :'
+            }
+          },
         });
 
         // Debug: Log current subscription state
