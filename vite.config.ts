@@ -60,6 +60,10 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
+        // IMPORTANT: Use a SINGLE service worker for both PWA caching and OneSignal push.
+        // This avoids iOS Safari/PWA conflicts where only one SW can control the scope.
+        // OneSignal will be configured to use /sw.js (see index.html).
+        importScripts: ["https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"],
         // Cache ALL files for offline use
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,svg,webp,woff,woff2}"],
         // Pre-cache the main page
