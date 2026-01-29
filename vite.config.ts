@@ -18,9 +18,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      // Keep the default SW filename explicit; OneSignal will be configured to use this SW.
-      filename: "sw.js",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon-192x192.png", "icon-512x512.png"],
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon-192x192.png", "icon-512x512.png", "OneSignalSDKWorker.js"],
       manifest: {
         name: "MM Tacos Bamako - Les Meilleurs Tacos",
         short_name: "MM Tacos",
@@ -56,9 +54,6 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
-        // Merge OneSignal push handling into the same Service Worker used for offline mode.
-        // This avoids the "0 users" issue caused by service worker scope conflicts.
-        importScripts: ["https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js"],
         // Cache ALL files for offline use
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,svg,webp,woff,woff2}"],
         // Pre-cache the main page

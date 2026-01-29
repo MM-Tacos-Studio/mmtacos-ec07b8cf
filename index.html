@@ -16,23 +16,36 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
-        // Use the SAME service worker as the PWA to avoid SW scope conflicts.
         await OneSignal.init({
           appId: "c40f393d-a89b-4cbe-b1c0-64cf7aa0cbc1",
-          serviceWorkerPath: "/sw.js",
+          // Use the standard OneSignal service worker file
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
           serviceWorkerParam: { scope: "/" },
+          allowLocalhostAsSecureOrigin: true,
         });
 
-        // Important (v16+): permission alone isn't always enough; ensure a PushSubscription exists.
+        // v16+: Ensure user is opted in after permission is granted
+        OneSignal.Notifications.addEventListener("permissionChange", async function(permission) {
+          if (permission) {
+            try {
+              await OneSignal.User.PushSubscription.optIn();
+              console.log("OneSignal: User opted in successfully");
+            } catch (e) {
+              console.warn("OneSignal optIn error:", e);
+            }
+          }
+        });
+
+        // Check if already permitted but not subscribed
         try {
-          if (
-            OneSignal.Notifications.permissionNative !== "denied" &&
-            !OneSignal.User.PushSubscription.optedIn
-          ) {
+          const permission = OneSignal.Notifications.permission;
+          const optedIn = OneSignal.User.PushSubscription.optedIn;
+          if (permission && !optedIn) {
             await OneSignal.User.PushSubscription.optIn();
+            console.log("OneSignal: Existing permission - opted in");
           }
         } catch (e) {
-          console.warn("OneSignal optIn error:", e);
+          console.warn("OneSignal initial optIn check error:", e);
         }
       });
     </script>
