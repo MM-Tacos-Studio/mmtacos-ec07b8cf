@@ -16,36 +16,69 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
+        // Force update of OneSignal service worker on each visit
+        if ('serviceWorker' in navigator) {
+          try {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const reg of registrations) {
+              if (reg.active && reg.active.scriptURL.includes('OneSignal')) {
+                await reg.update();
+                console.log("OneSignal: Service Worker updated");
+              }
+            }
+          } catch (e) {
+            console.warn("OneSignal: SW update check failed", e);
+          }
+        }
+
         await OneSignal.init({
           appId: "c40f393d-a89b-4cbe-b1c0-64cf7aa0cbc1",
-          // Use the standard OneSignal service worker file
           serviceWorkerPath: "/OneSignalSDKWorker.js",
           serviceWorkerParam: { scope: "/" },
           allowLocalhostAsSecureOrigin: true,
+          // Force re-subscribe if token is stale
+          notifyButton: { enable: false },
         });
+
+        // Debug: Log current subscription state
+        console.log("OneSignal: Permission =", OneSignal.Notifications.permission);
+        console.log("OneSignal: OptedIn =", OneSignal.User.PushSubscription.optedIn);
+        console.log("OneSignal: Token =", OneSignal.User.PushSubscription.token);
 
         // v16+: Ensure user is opted in after permission is granted
         OneSignal.Notifications.addEventListener("permissionChange", async function(permission) {
           if (permission) {
             try {
               await OneSignal.User.PushSubscription.optIn();
-              console.log("OneSignal: User opted in successfully");
+              console.log("OneSignal: User opted in after permission change");
             } catch (e) {
               console.warn("OneSignal optIn error:", e);
             }
           }
         });
 
-        // Check if already permitted but not subscribed
+        // Handle subscription changes to detect token refresh
+        OneSignal.User.PushSubscription.addEventListener("change", function(event) {
+          console.log("OneSignal: Subscription changed", event);
+          if (event.current.token) {
+            console.log("OneSignal: New token acquired:", event.current.token.substring(0, 20) + "...");
+          }
+        });
+
+        // Check and fix stale subscriptions
         try {
           const permission = OneSignal.Notifications.permission;
           const optedIn = OneSignal.User.PushSubscription.optedIn;
-          if (permission && !optedIn) {
+          const token = OneSignal.User.PushSubscription.token;
+          
+          // If permission granted but no valid subscription, force re-subscribe
+          if (permission && (!optedIn || !token)) {
+            console.log("OneSignal: Fixing stale subscription...");
             await OneSignal.User.PushSubscription.optIn();
-            console.log("OneSignal: Existing permission - opted in");
+            console.log("OneSignal: Re-subscribed successfully");
           }
         } catch (e) {
-          console.warn("OneSignal initial optIn check error:", e);
+          console.warn("OneSignal subscription fix error:", e);
         }
       });
     </script>
