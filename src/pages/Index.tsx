@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "@/components/TopBar";
+import { initOneSignal } from "@/lib/onesignal";
 import Navbar from "@/components/Navbar";
 import PromoMarquee from "@/components/PromoMarquee";
 import HeroSection from "@/components/HeroSection";
@@ -17,6 +18,11 @@ import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Initialize OneSignal for push notifications
+  useEffect(() => {
+    initOneSignal();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
