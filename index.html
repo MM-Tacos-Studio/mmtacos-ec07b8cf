@@ -11,6 +11,18 @@
     </script>
     <!-- End Google Tag Manager -->
 
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(function(OneSignal) {
+        OneSignal.init({
+          appId: "c40f393d-a89b-4cbe-b1c0-64cf7aa0cbc1",
+        });
+      });
+    </script>
+    <!-- End OneSignal SDK -->
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     
