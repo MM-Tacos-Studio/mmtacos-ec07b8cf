@@ -16,6 +16,13 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
+        // Prevent double initialization (React StrictMode / HMR)
+        if (window.__oneSignalInitialized) {
+          console.log("OneSignal: Already initialized, skipping");
+          return;
+        }
+        window.__oneSignalInitialized = true;
+
         // Force update of OneSignal service worker on each visit
         if ('serviceWorker' in navigator) {
           try {
