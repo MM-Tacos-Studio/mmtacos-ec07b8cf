@@ -202,12 +202,21 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu }: EnterpriseMenuOrder
 
         {/* Order Button */}
         <div className="border-t border-border pt-4 mt-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-lg font-bold">Total</span>
             <span className="text-xl font-bold text-primary">
               {menu.price.toLocaleString()} FCFA
             </span>
           </div>
+          
+          {/* Payment Info Banner */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex items-center gap-2">
+            <span className="text-amber-600 text-lg">💵</span>
+            <span className="text-amber-800 text-sm font-medium">
+              Paiement à la livraison (espèces ou Orange Money)
+            </span>
+          </div>
+          
           <button
             onClick={handleOrder}
             disabled={!deliveryType || (deliveryType === "livraison" && !deliveryAddress.trim())}
