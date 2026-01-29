@@ -18,7 +18,13 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon-192x192.png", "icon-512x512.png", "OneSignalSDKWorker.js"],
+      // Force service worker update check on every page load
+      devOptions: {
+        enabled: false,
+      },
+      // Exclude OneSignal SW from PWA handling - let OneSignal manage it separately
+      injectRegister: "auto",
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon-192x192.png", "icon-512x512.png"],
       manifest: {
         name: "MM Tacos Bamako - Les Meilleurs Tacos",
         short_name: "MM Tacos",
