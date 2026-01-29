@@ -11,6 +11,7 @@ import PromoBanner from "@/components/PromoBanner";
 import DrinksSection from "@/components/DrinksSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 import promoBanner from "@/assets/promo-banner-1.jpg";
 
@@ -60,6 +61,9 @@ const Index = () => {
 
       {/* Scroll to Top Button */}
       <ScrollToTop />
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 };
