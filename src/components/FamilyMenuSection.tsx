@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Users, Gift, Truck, MessageCircle, Check } from "lucide-react";
 import FamilyMenuOrderModal from "./FamilyMenuOrderModal";
-import { useDeliveryMode } from "@/hooks/useDeliveryMode";
+import type { DeliveryMode } from "./TopBar";
 
 import familyImg1 from "@/assets/family-menu-1.jpeg";
 import familyImg2 from "@/assets/family-menu-2.jpeg";
 import familyImg3 from "@/assets/family-menu-3.jpeg";
 import familyImg4 from "@/assets/family-menu-4.jpeg";
+
+interface FamilyMenuSectionProps {
+  deliveryMode: DeliveryMode;
+  deliveryAddress: string;
+}
 
 interface FamilyMenu {
   id: string;
@@ -72,10 +77,9 @@ const familyMenus: FamilyMenu[] = [
   },
 ];
 
-const FamilyMenuSection = () => {
+const FamilyMenuSection = ({ deliveryMode, deliveryAddress }: FamilyMenuSectionProps) => {
   const [selectedMenu, setSelectedMenu] = useState<FamilyMenu | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const handleMenuClick = (menu: FamilyMenu) => {
     setSelectedMenu(menu);

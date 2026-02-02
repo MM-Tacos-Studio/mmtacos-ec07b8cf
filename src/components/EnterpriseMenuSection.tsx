@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Building2, MessageCircle, Users, Check } from "lucide-react";
 import EnterpriseMenuOrderModal from "./EnterpriseMenuOrderModal";
-import { useDeliveryMode } from "@/hooks/useDeliveryMode";
+import type { DeliveryMode } from "./TopBar";
 
 import enterpriseImg1 from "@/assets/enterprise-menu-1.jpeg";
 import enterpriseImg2 from "@/assets/enterprise-menu-2.jpeg";
 import enterpriseImg3 from "@/assets/enterprise-menu-3.jpeg";
+
+interface EnterpriseMenuSectionProps {
+  deliveryMode: DeliveryMode;
+  deliveryAddress: string;
+}
 
 interface EnterpriseMenu {
   id: string;
@@ -67,10 +72,9 @@ const enterpriseMenus: EnterpriseMenu[] = [
   },
 ];
 
-const EnterpriseMenuSection = () => {
+const EnterpriseMenuSection = ({ deliveryMode, deliveryAddress }: EnterpriseMenuSectionProps) => {
   const [selectedMenu, setSelectedMenu] = useState<EnterpriseMenu | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const handleMenuClick = (menu: EnterpriseMenu) => {
     setSelectedMenu(menu);
