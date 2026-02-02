@@ -11,17 +11,23 @@ import PromoBanner from "@/components/PromoBanner";
 import DrinksSection from "@/components/DrinksSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import DeliveryModeModal from "@/components/DeliveryModeModal";
+import { useDeliveryMode } from "@/hooks/useDeliveryMode";
 
 import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { deliveryMode, showModeModal, setDeliveryMode } = useDeliveryMode();
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top Bar */}
-      <TopBar />
+      {/* Top Bar with delivery mode indicator */}
+      <TopBar 
+        deliveryMode={deliveryMode} 
+        onModeChange={setDeliveryMode}
+        showInstallButton={true}
+      />
       
       {/* Navbar */}
       <Navbar />
@@ -62,8 +68,11 @@ const Index = () => {
       {/* Scroll to Top Button */}
       <ScrollToTop />
 
-      {/* PWA Install Prompt */}
-      <PWAInstallPrompt />
+      {/* Delivery Mode Selection Modal */}
+      <DeliveryModeModal
+        isOpen={showModeModal}
+        onSelect={setDeliveryMode}
+      />
     </div>
   );
 };

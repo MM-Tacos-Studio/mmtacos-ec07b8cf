@@ -22,7 +22,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 88000, 
     pricePerMenu: 4400,
     image: enterpriseImg1,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
   { 
     id: "enterprise-25", 
@@ -30,7 +30,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 108000, 
     pricePerMenu: 4320,
     image: enterpriseImg1,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
   { 
     id: "enterprise-30", 
@@ -38,7 +38,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 129000, 
     pricePerMenu: 4300,
     image: enterpriseImg2,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
   { 
     id: "enterprise-35", 
@@ -46,7 +46,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 148000, 
     pricePerMenu: 4229,
     image: enterpriseImg2,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
   { 
     id: "enterprise-40", 
@@ -54,7 +54,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 166000, 
     pricePerMenu: 4150,
     image: enterpriseImg3,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
   { 
     id: "enterprise-50", 
@@ -62,7 +62,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
     price: 205000, 
     pricePerMenu: 4100,
     image: enterpriseImg3,
-    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites + Boisson"]
+    features: ["Tacos viande ou poulet", "Sauce fromagère", "Frites croustillantes + Boisson"]
   },
 ];
 
@@ -117,7 +117,7 @@ const EnterpriseMenuSection = () => {
                     <div className="text-4xl font-extrabold text-white">
                       {menu.quantity}
                     </div>
-                    <div className="text-sm font-medium text-white/80">menus</div>
+                    <div className="text-sm font-medium text-white/80">Menus Tacos</div>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-extrabold text-white">

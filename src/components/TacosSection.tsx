@@ -43,6 +43,7 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
@@ -54,6 +55,7 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
@@ -65,17 +67,19 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
     id: "kfc",
     name: "Tacos KFC",
-    description: "KFC, sauce fromagère, frites croustillantes",
+    description: "Poulet croustillant KFC, sauce fromagère, frites croustillantes",
     price: 5000,
     image: tacosKfc,
     sizes: [
       { name: "M", price: 5000 },
       { name: "XL", price: 8000 },
+      { name: "XXL", price: 12000 },
     ],
   },
   {
@@ -87,6 +91,7 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 5500 },
       { name: "XL", price: 8000 },
+      { name: "XXL", price: 12000 },
     ],
     requiresMeatChoice: true,
   },
@@ -99,50 +104,55 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 5000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 12000 },
     ],
   },
   {
     id: "hotdog",
     name: "Tacos Hotdog",
-    description: "Hotdog poulet, sauce fromagère, frites croustillantes",
+    description: "Saucisse hotdog poulet, sauce fromagère, frites croustillantes",
     price: 4000,
     image: tacosHotdog,
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
     id: "merguez",
     name: "Tacos Merguez",
-    description: "Merguez, sauce fromagère, frites croustillantes",
+    description: "Merguez grillée, sauce fromagère, frites croustillantes",
     price: 4000,
     image: tacosMerguez,
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
     id: "crevettes",
     name: "Tacos Crevettes",
-    description: "Crevettes, sauce fromagère, frites croustillantes",
+    description: "Crevettes sautées, sauce fromagère, frites croustillantes",
     price: 7500,
     image: tacosCrevettes,
     sizes: [
       { name: "M", price: 7500 },
       { name: "XL", price: 12500 },
+      { name: "XXL", price: 18500 },
     ],
   },
   {
     id: "saumon",
     name: "Tacos Saumon",
-    description: "Saumon, sauce fromagère, frites croustillantes",
+    description: "Saumon fumé, sauce fromagère, frites croustillantes",
     price: 6000,
     image: tacosSaumon,
     sizes: [
       { name: "M", price: 6000 },
       { name: "XL", price: 8000 },
+      { name: "XXL", price: 12000 },
     ],
   },
   {
@@ -154,12 +164,13 @@ const tacos: Taco[] = [
     sizes: [
       { name: "M", price: 4000 },
       { name: "XL", price: 6500 },
+      { name: "XXL", price: 10000 },
     ],
   },
   {
     id: "kfc-box",
     name: "MM'KFC Box",
-    description: "3 pièces de poulet croustillant + frites + boisson",
+    description: "3 pièces de poulet croustillant + frites croustillantes + boisson",
     price: 5000,
     image: kfcBox,
   },
