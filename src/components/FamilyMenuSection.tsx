@@ -25,7 +25,7 @@ const familyMenus: FamilyMenu[] = [
     features: [
       "Tacos viande ou poulet au choix",
       "Sauce fromagère",
-      "Frites à l'intérieur + accompagnement",
+      "Frites croustillantes (dans le tacos + accompagnement)",
       "1 boisson par menu",
     ],
     image: familyImg1,
@@ -38,7 +38,7 @@ const familyMenus: FamilyMenu[] = [
     features: [
       "Tacos viande ou poulet",
       "Sauce fromagère",
-      "Frites (dans le tacos + accompagnement)",
+      "Frites croustillantes (dans le tacos + accompagnement)",
       "1 boisson par menu",
     ],
     popular: true,
@@ -49,7 +49,7 @@ const familyMenus: FamilyMenu[] = [
     quantity: 15,
     price: 68000,
     features: [
-      "1 Tacos viande ou poulet généreux",
+      "Tacos viande ou poulet généreux",
       "Frites croustillantes",
       "Boisson fraîche",
       "Mélange possible viande & poulet",
@@ -62,8 +62,8 @@ const familyMenus: FamilyMenu[] = [
     price: 90000,
     bonus: "2 boissons offertes",
     features: [
-      "1 Tacos au choix (viande ou poulet)",
-      "Frites",
+      "Tacos au choix (viande ou poulet)",
+      "Frites croustillantes",
       "Boisson",
       "Livraison possible selon zone",
     ],
@@ -140,7 +140,7 @@ const FamilyMenuSection = () => {
                       {menu.quantity}
                     </div>
                     <div className="text-sm font-bold text-foreground">
-                      MENUS
+                      Menu{menu.quantity > 1 ? "s" : ""} Tacos
                     </div>
                   </div>
                   <div className="text-right">
