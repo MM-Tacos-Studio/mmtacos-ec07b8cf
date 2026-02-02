@@ -82,17 +82,17 @@ const TopBar = ({ deliveryMode, onModeChange, showInstallButton = true }: TopBar
               </button>
               
               {showModeDropdown && (
-                <div className="absolute top-full left-0 mt-1 bg-card rounded-lg shadow-lg z-50 min-w-[150px] overflow-hidden">
+                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-[100] min-w-[180px] overflow-hidden">
                   <button
                     onClick={() => handleModeSelect("livraison")}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors ${deliveryMode === "livraison" ? "bg-accent" : ""}`}
+                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${deliveryMode === "livraison" ? "bg-primary/10 text-primary" : ""}`}
                   >
                     <Truck className="h-4 w-4" />
                     Livraison
                   </button>
                   <button
                     onClick={() => handleModeSelect("emporter")}
-                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors ${deliveryMode === "emporter" ? "bg-accent" : ""}`}
+                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${deliveryMode === "emporter" ? "bg-primary/10 text-primary" : ""}`}
                   >
                     <MapPin className="h-4 w-4" />
                     Je viendrais récupérer
