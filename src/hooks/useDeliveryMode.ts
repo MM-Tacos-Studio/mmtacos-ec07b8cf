@@ -20,14 +20,12 @@ export const useDeliveryMode = () => {
       if (storedAddress) {
         setDeliveryAddress(storedAddress);
       }
+      setIsInitialized(true);
     } else {
-      // Show modal after a short delay for first-time visitors
-      const timer = setTimeout(() => {
-        setShowModeModal(true);
-      }, 1500);
-      return () => clearTimeout(timer);
+      // Show modal immediately for first-time visitors (no delay)
+      setShowModeModal(true);
+      setIsInitialized(true);
     }
-    setIsInitialized(true);
   }, []);
 
   // Save mode and address to localStorage
