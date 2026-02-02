@@ -18,7 +18,7 @@ import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { deliveryMode, showModeModal, setDeliveryMode } = useDeliveryMode();
+  const { deliveryMode, showModeModal, setDeliveryMode, handleViewMenu } = useDeliveryMode();
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,6 +72,7 @@ const Index = () => {
       <DeliveryModeModal
         isOpen={showModeModal}
         onSelect={setDeliveryMode}
+        onViewMenu={handleViewMenu}
       />
     </div>
   );

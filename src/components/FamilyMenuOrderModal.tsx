@@ -27,9 +27,10 @@ interface FamilyMenuOrderModalProps {
   onClose: () => void;
   menu: FamilyMenu | null;
   initialDeliveryMode?: "livraison" | "emporter" | null;
+  initialDeliveryAddress?: string;
 }
 
-const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode }: FamilyMenuOrderModalProps) => {
+const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, initialDeliveryAddress }: FamilyMenuOrderModalProps) => {
   const [meatDistribution, setMeatDistribution] = useState<MeatDistribution>({ viande: 0, poulet: 0 });
   const [deliveryType, setDeliveryType] = useState<"livraison" | "emporter" | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -43,9 +44,9 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode }: Fa
         poulet: half,
       });
       setDeliveryType(initialDeliveryMode || null);
-      setDeliveryAddress("");
+      setDeliveryAddress(initialDeliveryAddress || "");
     }
-  }, [menu, isOpen, initialDeliveryMode]);
+  }, [menu, isOpen, initialDeliveryMode, initialDeliveryAddress]);
 
   if (!menu) return null;
 

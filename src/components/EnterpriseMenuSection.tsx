@@ -70,7 +70,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
 const EnterpriseMenuSection = () => {
   const [selectedMenu, setSelectedMenu] = useState<EnterpriseMenu | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode } = useDeliveryMode();
+  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const handleMenuClick = (menu: EnterpriseMenu) => {
     setSelectedMenu(menu);
@@ -173,6 +173,7 @@ const EnterpriseMenuSection = () => {
         onClose={() => setIsModalOpen(false)}
         menu={selectedMenu}
         initialDeliveryMode={deliveryMode}
+        initialDeliveryAddress={deliveryAddress}
       />
     </section>
   );

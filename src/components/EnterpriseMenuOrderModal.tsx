@@ -24,9 +24,10 @@ interface EnterpriseMenuOrderModalProps {
   onClose: () => void;
   menu: EnterpriseMenu | null;
   initialDeliveryMode?: "livraison" | "emporter" | null;
+  initialDeliveryAddress?: string;
 }
 
-const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode }: EnterpriseMenuOrderModalProps) => {
+const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, initialDeliveryAddress }: EnterpriseMenuOrderModalProps) => {
   const [meatDistribution, setMeatDistribution] = useState<MeatDistribution>({ viande: 0, poulet: 0 });
   const [deliveryType, setDeliveryType] = useState<"livraison" | "emporter" | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -40,10 +41,10 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode }
         poulet: half,
       });
       setDeliveryType(initialDeliveryMode || null);
-      setDeliveryAddress("");
+      setDeliveryAddress(initialDeliveryAddress || "");
       setCompanyName("");
     }
-  }, [menu, isOpen, initialDeliveryMode]);
+  }, [menu, isOpen, initialDeliveryMode, initialDeliveryAddress]);
 
   if (!menu) return null;
 

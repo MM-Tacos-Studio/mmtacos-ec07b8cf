@@ -31,6 +31,7 @@ interface OrderModalProps {
   onClose: () => void;
   taco: Taco | null;
   initialDeliveryMode?: "livraison" | "emporter" | null;
+  initialDeliveryAddress?: string;
 }
 
 const supplements: Supplement[] = [
@@ -48,7 +49,7 @@ const supplements: Supplement[] = [
   { id: "menthe-lait", name: "Menthe au lait", price: 1000, category: "boisson" },
 ];
 
-const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode }: OrderModalProps) => {
+const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliveryAddress }: OrderModalProps) => {
   const [selectedSupplements, setSelectedSupplements] = useState<Record<string, number>>({});
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<TacoSize | null>(null);
@@ -64,9 +65,9 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode }: OrderModalPr
       setSelectedSize(taco.sizes?.[0] || null);
       setMeatChoice(null);
       setDeliveryType(initialDeliveryMode || null);
-      setDeliveryAddress("");
+      setDeliveryAddress(initialDeliveryAddress || "");
     }
-  }, [taco, isOpen, initialDeliveryMode]);
+  }, [taco, isOpen, initialDeliveryMode, initialDeliveryAddress]);
 
   if (!taco) return null;
 
