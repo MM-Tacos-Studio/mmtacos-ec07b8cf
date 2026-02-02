@@ -14,10 +14,12 @@ import tacosSaumon from "@/assets/tacos-saumon-2.jpeg";
 import tacosCorNedBeef from "@/assets/tacos-corned-beef.jpeg";
 import tacosPaneMiel from "@/assets/tacos-pane-miel.jpeg";
 import kfcBox from "@/assets/mm-kfc-box.jpeg";
-import { useDeliveryMode } from "@/hooks/useDeliveryMode";
+import type { DeliveryMode } from "./TopBar";
 
 interface TacosSectionProps {
   searchQuery: string;
+  deliveryMode: DeliveryMode;
+  deliveryAddress: string;
 }
 
 export interface TacoSize {
@@ -178,10 +180,9 @@ const tacos: Taco[] = [
   },
 ];
 
-const TacosSection = ({ searchQuery }: TacosSectionProps) => {
+const TacosSection = ({ searchQuery, deliveryMode, deliveryAddress }: TacosSectionProps) => {
   const [selectedTaco, setSelectedTaco] = useState<Taco | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const filteredTacos = tacos.filter(
     (taco) =>

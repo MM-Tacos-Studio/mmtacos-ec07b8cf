@@ -18,7 +18,7 @@ import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { deliveryMode, showModeModal, setDeliveryMode, handleViewMenu } = useDeliveryMode();
+  const { deliveryMode, deliveryAddress, showModeModal, setDeliveryMode, handleViewMenu } = useDeliveryMode();
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,7 +39,7 @@ const Index = () => {
       <PromoMarquee />
 
       {/* Tacos Section - Individual */}
-      <TacosSection searchQuery={searchQuery} />
+      <TacosSection searchQuery={searchQuery} deliveryMode={deliveryMode} deliveryAddress={deliveryAddress} />
 
       {/* Promo Banner - MM'KFC */}
       <PromoBanner
@@ -51,10 +51,10 @@ const Index = () => {
       />
 
       {/* Family Menu Section */}
-      <FamilyMenuSection />
+      <FamilyMenuSection deliveryMode={deliveryMode} deliveryAddress={deliveryAddress} />
 
       {/* Enterprise Menu Section */}
-      <EnterpriseMenuSection />
+      <EnterpriseMenuSection deliveryMode={deliveryMode} deliveryAddress={deliveryAddress} />
 
       {/* Drinks Section - At the bottom before Trust/Footer */}
       <DrinksSection />
