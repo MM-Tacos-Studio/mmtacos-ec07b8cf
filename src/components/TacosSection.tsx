@@ -181,7 +181,7 @@ const tacos: Taco[] = [
 const TacosSection = ({ searchQuery }: TacosSectionProps) => {
   const [selectedTaco, setSelectedTaco] = useState<Taco | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode } = useDeliveryMode();
+  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const filteredTacos = tacos.filter(
     (taco) =>
@@ -235,6 +235,7 @@ const TacosSection = ({ searchQuery }: TacosSectionProps) => {
         onClose={() => setIsModalOpen(false)}
         taco={selectedTaco}
         initialDeliveryMode={deliveryMode}
+        initialDeliveryAddress={deliveryAddress}
       />
     </section>
   );

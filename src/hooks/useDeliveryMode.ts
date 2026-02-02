@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import type { DeliveryMode } from "@/components/TopBar";
 
-const STORAGE_KEY = "mm-tacos-delivery-mode";
+const MODE_STORAGE_KEY = "mm-tacos-delivery-mode";
+const ADDRESS_STORAGE_KEY = "mm-tacos-delivery-address";
 
 export const useDeliveryMode = () => {
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
   const [showModeModal, setShowModeModal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "livraison" || stored === "emporter") {
-      setDeliveryMode(stored);
+    const storedMode = localStorage.getItem(MODE_STORAGE_KEY);
+    const storedAddress = localStorage.getItem(ADDRESS_STORAGE_KEY);
+    
+    if (storedMode === "livraison" || storedMode === "emporter") {
+      setDeliveryMode(storedMode);
+      if (storedAddress) {
+        setDeliveryAddress(storedAddress);
+      }
     } else {
       // Show modal after a short delay for first-time visitors
       const timer = setTimeout(() => {
@@ -23,20 +30,32 @@ export const useDeliveryMode = () => {
     setIsInitialized(true);
   }, []);
 
-  // Save to localStorage when mode changes
-  const handleModeChange = (mode: DeliveryMode) => {
+  // Save mode and address to localStorage
+  const handleModeChange = (mode: DeliveryMode, address?: string) => {
     setDeliveryMode(mode);
     if (mode) {
-      localStorage.setItem(STORAGE_KEY, mode);
+      localStorage.setItem(MODE_STORAGE_KEY, mode);
     }
+    if (address) {
+      setDeliveryAddress(address);
+      localStorage.setItem(ADDRESS_STORAGE_KEY, address);
+    }
+    setShowModeModal(false);
+    setIsInitialized(true);
+  };
+
+  // Handle "View Menu" without selecting mode
+  const handleViewMenu = () => {
     setShowModeModal(false);
     setIsInitialized(true);
   };
 
   return {
     deliveryMode,
+    deliveryAddress,
     showModeModal,
     isInitialized,
     setDeliveryMode: handleModeChange,
+    handleViewMenu,
   };
 };

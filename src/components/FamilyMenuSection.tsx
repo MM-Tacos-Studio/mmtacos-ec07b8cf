@@ -75,7 +75,7 @@ const familyMenus: FamilyMenu[] = [
 const FamilyMenuSection = () => {
   const [selectedMenu, setSelectedMenu] = useState<FamilyMenu | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { deliveryMode } = useDeliveryMode();
+  const { deliveryMode, deliveryAddress } = useDeliveryMode();
 
   const handleMenuClick = (menu: FamilyMenu) => {
     setSelectedMenu(menu);
@@ -194,6 +194,7 @@ const FamilyMenuSection = () => {
         onClose={() => setIsModalOpen(false)}
         menu={selectedMenu}
         initialDeliveryMode={deliveryMode}
+        initialDeliveryAddress={deliveryAddress}
       />
     </section>
   );
