@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building2, MessageCircle, Users, Check } from "lucide-react";
 import EnterpriseMenuOrderModal from "./EnterpriseMenuOrderModal";
+import { useDeliveryMode } from "@/hooks/useDeliveryMode";
 
 import enterpriseImg1 from "@/assets/enterprise-menu-1.jpeg";
 import enterpriseImg2 from "@/assets/enterprise-menu-2.jpeg";
@@ -69,6 +70,7 @@ const enterpriseMenus: EnterpriseMenu[] = [
 const EnterpriseMenuSection = () => {
   const [selectedMenu, setSelectedMenu] = useState<EnterpriseMenu | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { deliveryMode } = useDeliveryMode();
 
   const handleMenuClick = (menu: EnterpriseMenu) => {
     setSelectedMenu(menu);
@@ -170,6 +172,7 @@ const EnterpriseMenuSection = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         menu={selectedMenu}
+        initialDeliveryMode={deliveryMode}
       />
     </section>
   );
