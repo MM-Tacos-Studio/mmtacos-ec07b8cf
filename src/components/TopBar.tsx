@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Phone, Clock, Download, MapPin, Truck, ChevronDown } from "lucide-react";
+import { Phone, Download, MapPin, Truck, ChevronDown } from "lucide-react";
+import OpenStatus from "./OpenStatus";
 
 export type DeliveryMode = "livraison" | "emporter" | null;
 
@@ -104,6 +105,11 @@ const TopBar = ({ deliveryMode, onModeChange, showInstallButton = true }: TopBar
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Open/Closed Status */}
+          <div className="bg-white/20 px-2 py-1 rounded-full">
+            <OpenStatus />
+          </div>
+          
           {/* Install Button - Only show if not standalone and prompt available */}
           {showInstallButton && !isStandalone && deferredPrompt && (
             <button
@@ -114,11 +120,6 @@ const TopBar = ({ deliveryMode, onModeChange, showInstallButton = true }: TopBar
               <span className="hidden sm:inline">Installer</span>
             </button>
           )}
-          
-          <div className="flex items-center gap-1 md:gap-2">
-            <Clock className="h-4 w-4" />
-            <span className="font-medium text-xs md:text-sm">9h - 4h</span>
-          </div>
         </div>
       </div>
     </div>

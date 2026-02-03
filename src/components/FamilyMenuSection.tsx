@@ -23,17 +23,20 @@ interface FamilyMenu {
   image: string;
 }
 
+// Description commune pour tous les menus
+const commonFeatures = [
+  "Tacos viande ou poulet au choix",
+  "Sauce fromagère",
+  "Frites croustillantes (dans le tacos + accompagnement)",
+  "1 boisson par menu",
+];
+
 const familyMenus: FamilyMenu[] = [
   {
     id: "family-5",
     quantity: 5,
     price: 23500,
-    features: [
-      "Tacos viande ou poulet au choix",
-      "Sauce fromagère",
-      "Frites croustillantes (dans le tacos + accompagnement)",
-      "1 boisson par menu",
-    ],
+    features: commonFeatures,
     image: familyImg1,
   },
   {
@@ -41,12 +44,7 @@ const familyMenus: FamilyMenu[] = [
     quantity: 10,
     price: 46000,
     bonus: "1 boisson offerte",
-    features: [
-      "Tacos viande ou poulet",
-      "Sauce fromagère",
-      "Frites croustillantes (dans le tacos + accompagnement)",
-      "1 boisson par menu",
-    ],
+    features: commonFeatures,
     popular: true,
     image: familyImg2,
   },
@@ -54,12 +52,7 @@ const familyMenus: FamilyMenu[] = [
     id: "family-15",
     quantity: 15,
     price: 68000,
-    features: [
-      "Tacos viande ou poulet généreux",
-      "Frites croustillantes",
-      "Boisson fraîche",
-      "Mélange possible viande & poulet",
-    ],
+    features: commonFeatures,
     image: familyImg3,
   },
   {
@@ -67,12 +60,7 @@ const familyMenus: FamilyMenu[] = [
     quantity: 20,
     price: 90000,
     bonus: "2 boissons offertes",
-    features: [
-      "Tacos au choix (viande ou poulet)",
-      "Frites croustillantes",
-      "Boisson",
-      "Livraison possible selon zone",
-    ],
+    features: commonFeatures,
     image: familyImg4,
   },
 ];
