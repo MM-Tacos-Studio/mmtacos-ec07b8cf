@@ -69,7 +69,7 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
 
     const companyText = companyName.trim() ? `\n\n🏢 Entreprise : ${companyName.trim()}` : "";
 
-    const message = `Bonjour je voudrais commander :\n\n🏢 MENU ENTREPRISE ${menu.quantity} MENUS COMPLETS${companyText}\n\nRépartition :\n• ${meatDistribution.viande}x Tacos Viande\n• ${meatDistribution.poulet}x Tacos Poulet\n\nChaque menu comprend :\n• Tacos (viande ou poulet) + sauce fromagère\n• Frites à l'intérieur + accompagnement\n• Boisson\n\n${deliveryText}\n\nTotal : ${menu.price.toLocaleString()} FCFA\n(${menu.pricePerMenu.toLocaleString()} FCFA/menu)\n\nMerci !`;
+    const message = `Bonjour je voudrais commander :\n\n🏢 MENU ENTREPRISE ${menu.quantity} MENUS COMPLETS${companyText}\n\nRépartition :\n• ${meatDistribution.viande}x Tacos Viande\n• ${meatDistribution.poulet}x Tacos Poulet\n\nChaque menu comprend :\n• Tacos (viande ou poulet) + sauce fromagère\n• Frites à l'intérieur + accompagnement\n• Boisson\n\n${deliveryText}\n\nTotal : ${menu.price.toLocaleString()} FCFA\n(${menu.pricePerMenu.toLocaleString()} FCFA/menu)\n\nMerci !\n\n#Commandeviasitemmtacos`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");

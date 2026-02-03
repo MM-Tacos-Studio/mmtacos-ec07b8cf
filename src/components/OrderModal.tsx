@@ -123,7 +123,7 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
 
     const supplementsText = supplementsList ? `\n\nSuppléments : ${supplementsList}` : "";
 
-    const message = `Bonjour je voudrais commander :\n\n${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n\n${deliveryText}\n\nTotal : ${calculateTotal().toLocaleString()} FCFA\n\nMerci !`;
+    const message = `Bonjour je voudrais commander :\n\n${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n\n${deliveryText}\n\nTotal : ${calculateTotal().toLocaleString()} FCFA\n\nMerci !\n\n#Commandeviasitemmtacos`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");

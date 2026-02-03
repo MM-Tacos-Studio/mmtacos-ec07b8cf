@@ -71,7 +71,7 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, init
 
     const bonusText = menu.bonus ? `\n\n🎁 ${menu.bonus}` : "";
 
-    const message = `Bonjour je voudrais commander :\n\n👨‍👩‍👧‍👦 MENU FAMILIAL ${menu.quantity} MENUS COMPLETS\n\nRépartition :\n• ${meatDistribution.viande}x Tacos Viande\n• ${meatDistribution.poulet}x Tacos Poulet\n\nChaque menu comprend :\n• Tacos + Frites + Boisson${bonusText}\n\n${deliveryText}\n\nTotal : ${menu.price.toLocaleString()} FCFA\n\nMerci !`;
+    const message = `Bonjour je voudrais commander :\n\n👨‍👩‍👧‍👦 MENU FAMILIAL ${menu.quantity} MENUS COMPLETS\n\nRépartition :\n• ${meatDistribution.viande}x Tacos Viande\n• ${meatDistribution.poulet}x Tacos Poulet\n\nChaque menu comprend :\n• Tacos + Frites + Boisson${bonusText}\n\n${deliveryText}\n\nTotal : ${menu.price.toLocaleString()} FCFA\n\nMerci !\n\n#Commandeviasitemmtacos`;
 
     const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
