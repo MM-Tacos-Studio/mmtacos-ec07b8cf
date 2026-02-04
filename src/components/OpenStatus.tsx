@@ -7,15 +7,11 @@ const OpenStatus = () => {
     const checkIfOpen = () => {
       const now = new Date();
       const hour = now.getHours();
-      const day = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
       
-      // Horaires d'ouverture : 11h - 23h tous les jours
-      // Ajustez selon vos horaires réels
-      const openingHour = 11;
-      const closingHour = 23;
-      
-      // Ouvert tous les jours de 11h à 23h
-      const isWithinHours = hour >= openingHour && hour < closingHour;
+      // Horaires d'ouverture : 9h à 4h du matin (le lendemain)
+      // Ouvert de 9h (9) à 4h du matin (4)
+      // Donc ouvert si: hour >= 9 OU hour < 4
+      const isWithinHours = hour >= 9 || hour < 4;
       setIsOpen(isWithinHours);
     };
 
