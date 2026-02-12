@@ -19,11 +19,11 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Verify the user with anon client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+    // Verify the user
     const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     })
@@ -36,9 +36,22 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Use service role to insert the role
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Check if any admin already exists - only allow first user to become admin
+    const { count } = await adminClient
+      .from('user_roles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'admin')
+
+    if (count && count > 0) {
+      return new Response(JSON.stringify({ error: 'Un administrateur existe déjà. Contactez l\'admin existant.' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // First user becomes admin
     const { error: insertError } = await adminClient
       .from('user_roles')
       .insert({ user_id: user.id, role: 'admin' })
