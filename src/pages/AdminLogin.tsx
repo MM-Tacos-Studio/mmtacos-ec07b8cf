@@ -17,31 +17,29 @@ const AdminLogin = () => {
     setLoading(true);
 
     if (isSignUp) {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
+      const { data: fnData, error: fnError } = await supabase.functions.invoke("assign-admin-role", {
+        body: { email: email.trim(), password },
       });
 
-      if (signUpError) {
-        setError(signUpError.message);
+      if (fnError || fnData?.error) {
+        setError(fnData?.error || fnError?.message || "Erreur lors de la création du compte.");
         setLoading(false);
         return;
       }
 
-      if (data.session) {
-        // Assign admin role via edge function (uses service role)
-        const { error: fnError } = await supabase.functions.invoke("assign-admin-role", {
-          headers: { Authorization: `Bearer ${data.session.access_token}` },
-        });
+      // Now sign in with the created account
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
-        if (fnError) {
-          setError("Erreur lors de l'attribution du rôle admin.");
-          setLoading(false);
-          return;
-        }
-
-        navigate("/admin");
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
       }
+
+      navigate("/admin");
     } else {
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
