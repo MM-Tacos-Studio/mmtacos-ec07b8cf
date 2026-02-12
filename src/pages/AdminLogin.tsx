@@ -8,40 +8,68 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
+    if (isSignUp) {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+      });
 
-    if (authError) {
-      setError("Email ou mot de passe incorrect");
-      setLoading(false);
-      return;
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        // Assign admin role
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: data.user.id, role: "admin" as const });
+
+        if (roleError) {
+          setError("Erreur lors de l'attribution du rôle admin.");
+          setLoading(false);
+          return;
+        }
+
+        navigate("/admin");
+      }
+    } else {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (authError) {
+        setError("Email ou mot de passe incorrect");
+        setLoading(false);
+        return;
+      }
+
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!roleData) {
+        setError("Accès refusé. Vous n'êtes pas administrateur.");
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      navigate("/admin");
     }
-
-    // Check admin role
-    const { data: roleData } = await supabase
-      .from("user_roles" as any)
-      .select("role")
-      .eq("user_id", data.user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-
-    if (!roleData) {
-      setError("Accès refusé. Vous n'êtes pas administrateur.");
-      await supabase.auth.signOut();
-      setLoading(false);
-      return;
-    }
-
-    navigate("/admin");
   };
 
   return (
@@ -50,10 +78,12 @@ const AdminLogin = () => {
         <div className="text-center mb-8">
           <img src={logo} alt="MM Tacos" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground">Administration</h1>
-          <p className="text-muted-foreground text-sm">Connectez-vous pour accéder à la caisse</p>
+          <p className="text-muted-foreground text-sm">
+            {isSignUp ? "Créez votre compte administrateur" : "Connectez-vous pour accéder à la caisse"}
+          </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg text-center">
               {error}
@@ -74,6 +104,7 @@ const AdminLogin = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
             className="w-full p-3 rounded-lg border border-border bg-card text-foreground"
           />
 
@@ -82,9 +113,19 @@ const AdminLogin = () => {
             disabled={loading}
             className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? (isSignUp ? "Création..." : "Connexion...") : (isSignUp ? "Créer le compte" : "Se connecter")}
           </button>
         </form>
+
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
+          <button
+            onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
+            className="text-primary font-semibold hover:underline"
+          >
+            {isSignUp ? "Se connecter" : "Créer un compte"}
+          </button>
+        </p>
       </div>
     </div>
   );
