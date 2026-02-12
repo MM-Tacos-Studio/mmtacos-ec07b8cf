@@ -28,13 +28,13 @@ const AdminLogin = () => {
         return;
       }
 
-      if (data.user) {
-        // Assign admin role
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: data.user.id, role: "admin" as const });
+      if (data.session) {
+        // Assign admin role via edge function (uses service role)
+        const { error: fnError } = await supabase.functions.invoke("assign-admin-role", {
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        });
 
-        if (roleError) {
+        if (fnError) {
           setError("Erreur lors de l'attribution du rôle admin.");
           setLoading(false);
           return;
