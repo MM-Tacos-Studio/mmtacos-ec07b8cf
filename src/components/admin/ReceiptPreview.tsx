@@ -23,7 +23,6 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
   const now = new Date();
   const dateStr = now.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
   const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const change = Math.max(0, amountPaid - total);
 
   const handlePrint = () => {
     const printWindow = window.open("", "_blank", "width=302,height=600");
@@ -50,6 +49,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           .item-price { text-align: right; white-space: nowrap; }
           .total-row { font-weight: bold; font-size: 14px; }
           .footer { font-size: 10px; text-align: center; margin-top: 8px; }
+          .generator { font-size: 9px; text-align: center; margin-top: 12px; color: #666; }
         </style>
       </head>
       <body>
@@ -73,17 +73,14 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           </div>
         `).join("")}
         <div class="line"></div>
-        <div class="row"><span>Sous-total</span><span>${total.toLocaleString()} CFA</span></div>
-        <div class="row"><span>Taxe 0 %</span><span>0 CFA</span></div>
         <div class="row total-row"><span>Total</span><span>${total.toLocaleString()} CFA</span></div>
-        <div class="row"><span>${paymentMethod === "especes" ? "Espèces" : paymentMethod}</span><span>${amountPaid.toLocaleString()} CFA</span></div>
-        ${change > 0 ? `<div class="row"><span>Rendu</span><span>${change.toLocaleString()} CFA</span></div>` : ""}
         <div class="line"></div>
         <div class="footer">
           MM TACOS<br/>
           Magnambougou près du marché, Bamako<br/>
           mmtacosm2022@gmail.com
         </div>
+        <div class="generator">Généré par Jamaney Production</div>
       </body>
       </html>
     `;
@@ -123,16 +120,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
 
         <div className="border-t border-dashed border-gray-400 my-2" />
 
-        <div className="flex justify-between"><span>Sous-total</span><span>{total.toLocaleString()} CFA</span></div>
-        <div className="flex justify-between"><span>Taxe 0 %</span><span>0 CFA</span></div>
         <div className="flex justify-between font-bold text-sm"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
-        <div className="flex justify-between">
-          <span>{paymentMethod === "especes" ? "Espèces" : paymentMethod}</span>
-          <span>{amountPaid.toLocaleString()} CFA</span>
-        </div>
-        {change > 0 && (
-          <div className="flex justify-between"><span>Rendu</span><span>{change.toLocaleString()} CFA</span></div>
-        )}
 
         <div className="border-t border-dashed border-gray-400 my-2" />
         <div className="text-center text-[10px]">
@@ -140,6 +128,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           Magnambougou près du marché, Bamako<br />
           mmtacosm2022@gmail.com
         </div>
+        <p className="text-center text-[9px] text-gray-400 mt-3">Généré par Jamaney Production</p>
       </div>
 
       {/* Payment success */}
@@ -156,7 +145,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-3 rounded-lg font-medium hover:bg-muted/80"
         >
           <Printer className="h-4 w-4" />
-          Imprimer le reçu complet
+          Imprimer
         </button>
         <button
           onClick={onNewOrder}

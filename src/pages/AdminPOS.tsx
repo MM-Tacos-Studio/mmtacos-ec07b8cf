@@ -5,18 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { posProducts, type PosProduct } from "@/lib/posProducts";
 import ReceiptPreview, { type OrderItem } from "@/components/admin/ReceiptPreview";
 
-type Screen = "pos" | "payment" | "receipt";
+type Screen = "pos" | "receipt";
 
 const AdminPOS = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [screen, setScreen] = useState<Screen>("pos");
-  const [paymentMethod, setPaymentMethod] = useState("especes");
-  const [amountPaid, setAmountPaid] = useState(0);
-  const [numpadValue, setNumpadValue] = useState("");
   const [orderNumber, setOrderNumber] = useState("001");
   const [loading, setLoading] = useState(false);
+  const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
 
   // Auth check
   useEffect(() => {
@@ -45,18 +43,33 @@ const AdminPOS = () => {
     return posProducts.filter(p => p.name.toLowerCase().includes(q));
   }, [search]);
 
-  const total = useMemo(() => 
+  const total = useMemo(() =>
     orderItems.reduce((sum, item) => sum + item.price * item.qty, 0),
     [orderItems]
   );
 
   const addProduct = (product: PosProduct) => {
+    if (product.sizes && product.sizes.length > 0) {
+      setSizePickerProduct(product);
+      return;
+    }
+    addItemToOrder(product.id, product.name, product.price);
+  };
+
+  const addWithSize = (product: PosProduct, sizeName: string, sizePrice: number) => {
+    const itemId = `${product.id}-${sizeName}`;
+    const itemName = `${product.name} (${sizeName})`;
+    addItemToOrder(itemId, itemName, sizePrice);
+    setSizePickerProduct(null);
+  };
+
+  const addItemToOrder = (id: string, name: string, price: number) => {
     setOrderItems(prev => {
-      const existing = prev.find(i => i.id === product.id);
+      const existing = prev.find(i => i.id === id);
       if (existing) {
-        return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
       }
-      return [...prev, { id: product.id, name: product.name, qty: 1, price: product.price }];
+      return [...prev, { id, name, qty: 1, price }];
     });
   };
 
@@ -64,33 +77,11 @@ const AdminPOS = () => {
     setOrderItems(prev => prev.filter(i => i.id !== id));
   };
 
-  const handleNumpad = (val: string) => {
-    if (val === "C") {
-      setNumpadValue("");
-      setAmountPaid(0);
-    } else if (val === "⌫") {
-      const nv = numpadValue.slice(0, -1);
-      setNumpadValue(nv);
-      setAmountPaid(parseInt(nv) || 0);
-    } else {
-      const nv = numpadValue + val;
-      setNumpadValue(nv);
-      setAmountPaid(parseInt(nv) || 0);
-    }
-  };
-
-  const quickAmount = (val: number) => {
-    const nv = amountPaid + val;
-    setAmountPaid(nv);
-    setNumpadValue(nv.toString());
-  };
-
   const handlePayment = async () => {
-    if (amountPaid < total) return;
+    if (orderItems.length === 0) return;
     setLoading(true);
 
     try {
-      // Get next sequence
       const { data: seqData } = await supabase.rpc("get_next_daily_sequence" as any);
       const seq = (seqData as number) || 1;
       const numStr = seq.toString().padStart(3, "0");
@@ -105,9 +96,9 @@ const AdminPOS = () => {
         tax_rate: 0,
         tax_amount: 0,
         total,
-        payment_method: paymentMethod,
-        amount_paid: amountPaid,
-        change_amount: Math.max(0, amountPaid - total),
+        payment_method: "especes",
+        amount_paid: total,
+        change_amount: 0,
         created_by: session?.user?.id,
       });
 
@@ -123,9 +114,6 @@ const AdminPOS = () => {
   const handleNewOrder = () => {
     setOrderItems([]);
     setScreen("pos");
-    setAmountPaid(0);
-    setNumpadValue("");
-    setPaymentMethod("especes");
   };
 
   const handleLogout = async () => {
@@ -141,107 +129,10 @@ const AdminPOS = () => {
           items={orderItems}
           orderNumber={orderNumber}
           total={total}
-          paymentMethod={paymentMethod}
-          amountPaid={amountPaid}
+          paymentMethod="especes"
+          amountPaid={total}
           onNewOrder={handleNewOrder}
         />
-      </div>
-    );
-  }
-
-  // PAYMENT SCREEN
-  if (screen === "payment") {
-    const change = Math.max(0, amountPaid - total);
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        {/* Header */}
-        <div className="bg-card border-b border-border p-4 flex items-center justify-between">
-          <button onClick={() => setScreen("pos")} className="text-primary font-bold">← Retour</button>
-          <h1 className="font-bold text-lg">Paiement</h1>
-          <div />
-        </div>
-
-        <div className="flex-1 flex flex-col lg:flex-row">
-          {/* Left - Amount display */}
-          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-            <p className="text-6xl font-bold text-foreground">{total.toLocaleString()} <span className="text-2xl">CFA</span></p>
-            
-            <div className="flex gap-4 text-center">
-              <div>
-                <p className="text-muted-foreground text-sm">Payé</p>
-                <p className="text-2xl font-bold text-primary">{amountPaid.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground text-sm">Restant</p>
-                <p className="text-2xl font-bold">{Math.max(0, total - amountPaid).toLocaleString()}</p>
-              </div>
-            </div>
-
-            {/* Payment methods */}
-            <div className="flex gap-2 mt-4">
-              {["especes", "wave", "orange"].map(m => (
-                <button
-                  key={m}
-                  onClick={() => setPaymentMethod(m)}
-                  className={`px-4 py-2 rounded-lg font-medium capitalize ${
-                    paymentMethod === m ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
-                  }`}
-                >
-                  {m === "especes" ? "💵 Espèces" : m === "wave" ? "📱 Wave" : "📱 Orange Money"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Right - Numpad + actions */}
-          <div className="w-full lg:w-80 bg-card border-l border-border p-4 flex flex-col gap-3">
-            {/* Quick amounts */}
-            <div className="grid grid-cols-3 gap-2">
-              {[10, 20, 50].map(v => (
-                <button key={v} onClick={() => quickAmount(v * 100)}
-                  className="bg-green-100 text-green-800 py-2 rounded-lg font-bold text-sm">
-                  +{(v * 100).toLocaleString()}
-                </button>
-              ))}
-            </div>
-
-            {/* Numpad */}
-            <div className="grid grid-cols-3 gap-2">
-              {["1","2","3","4","5","6","7","8","9","+/-","0","⌫"].map(k => (
-                <button
-                  key={k}
-                  onClick={() => k !== "+/-" ? handleNumpad(k) : null}
-                  className={`py-3 rounded-lg font-bold text-lg ${
-                    k === "⌫" ? "bg-destructive/20 text-destructive" : "bg-muted text-foreground"
-                  }`}
-                >
-                  {k}
-                </button>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col gap-2 mt-auto">
-              <button
-                onClick={() => { setAmountPaid(total); setNumpadValue(total.toString()); }}
-                className="w-full bg-muted text-foreground py-2 rounded-lg font-medium text-sm"
-              >
-                📋 Facture
-              </button>
-              <button onClick={handleNumpad.bind(null, "C")}
-                className="w-full bg-muted text-foreground py-2 rounded-lg font-medium text-sm">
-                Client
-              </button>
-              <button
-                onClick={handlePayment}
-                disabled={amountPaid < total || loading || orderItems.length === 0}
-                className="w-full bg-primary text-primary-foreground py-4 rounded-lg font-bold text-lg disabled:opacity-50"
-              >
-                {loading ? "..." : "Paiement"}
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
@@ -249,7 +140,7 @@ const AdminPOS = () => {
   // POS SCREEN
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Bottom tabs (mobile) / Top bar */}
+      {/* Top bar */}
       <div className="bg-card border-b border-border p-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-1">
           <Search className="h-4 w-4 text-muted-foreground" />
@@ -281,7 +172,9 @@ const AdminPOS = () => {
                 </div>
                 <div className="p-1.5">
                   <p className="text-xs font-medium text-foreground leading-tight line-clamp-2">{product.name}</p>
-                  <p className="text-xs font-bold text-primary">{product.price.toLocaleString()}</p>
+                  <p className="text-xs font-bold text-primary">
+                    {product.sizes ? `${product.price.toLocaleString()}+` : product.price.toLocaleString()}
+                  </p>
                 </div>
               </button>
             ))}
@@ -290,7 +183,6 @@ const AdminPOS = () => {
 
         {/* Order Panel */}
         <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col max-h-[50vh] lg:max-h-full">
-          {/* Order items */}
           <div className="flex-1 overflow-y-auto p-3">
             {orderItems.length === 0 ? (
               <div className="text-center text-muted-foreground py-12">
@@ -321,25 +213,37 @@ const AdminPOS = () => {
               <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
             </div>
             <button
-              onClick={() => { if (orderItems.length > 0) setScreen("payment"); }}
-              disabled={orderItems.length === 0}
+              onClick={handlePayment}
+              disabled={orderItems.length === 0 || loading}
               className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
             >
-              Paiement
+              {loading ? "..." : "Paiement"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom tabs */}
-      <div className="bg-card border-t border-border flex">
-        <button className="flex-1 py-3 text-center text-sm font-medium text-primary border-t-2 border-primary">
-          Caisse
-        </button>
-        <button className="flex-1 py-3 text-center text-sm font-medium text-muted-foreground">
-          Commandes
-        </button>
-      </div>
+      {/* Size Picker Modal */}
+      {sizePickerProduct && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSizePickerProduct(null)}>
+          <div className="bg-card rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+            <h3 className="font-bold text-lg text-foreground mb-1">{sizePickerProduct.name}</h3>
+            <p className="text-sm text-muted-foreground mb-4">Choisissez la taille</p>
+            <div className="flex gap-3">
+              {sizePickerProduct.sizes!.map(size => (
+                <button
+                  key={size.name}
+                  onClick={() => addWithSize(sizePickerProduct, size.name, size.price)}
+                  className="flex-1 bg-muted hover:bg-primary hover:text-primary-foreground transition-colors rounded-lg p-4 text-center"
+                >
+                  <p className="text-lg font-bold">{size.name}</p>
+                  <p className="text-sm font-medium">{size.price.toLocaleString()}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
