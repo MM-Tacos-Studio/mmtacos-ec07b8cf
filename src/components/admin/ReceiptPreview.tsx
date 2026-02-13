@@ -80,7 +80,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           Magnambougou près du marché, Bamako<br/>
           mmtacosm2022@gmail.com
         </div>
-        <div class="generator">Généré par Jamaney Production</div>
+        <div class="generator">par Jamaney Production</div>
       </body>
       </html>
     `;
@@ -128,7 +128,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           Magnambougou près du marché, Bamako<br />
           mmtacosm2022@gmail.com
         </div>
-        <p className="text-center text-[9px] text-gray-400 mt-3">Généré par Jamaney Production</p>
+        <p className="text-center text-[9px] text-gray-400 mt-3">par Jamaney Production</p>
       </div>
 
       {/* Payment success */}
