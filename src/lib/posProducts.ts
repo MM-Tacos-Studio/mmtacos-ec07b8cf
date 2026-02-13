@@ -22,30 +22,46 @@ import supplementHotdog from "@/assets/supplement-hotdog.png";
 import drinkGeneric from "@/assets/drink-generic.png";
 import drinkMentheLait from "@/assets/drink-menthe-lait.png";
 
-// Menu tacos images (reuse tacos images for menus)
 import tacosPouletMenu from "@/assets/tacos-poulet-menu.jpeg";
+
+export interface PosProductSize {
+  name: string; // M, XL, XXL
+  price: number;
+}
 
 export interface PosProduct {
   id: string;
   name: string;
-  price: number;
+  price: number; // base price (M)
   image: string;
   category: "tacos" | "menu" | "supplement" | "boisson" | "special";
+  sizes?: PosProductSize[];
 }
 
 export const posProducts: PosProduct[] = [
-  // Tacos
-  { id: "tacos-viande", name: "Tacos Viande", price: 4000, image: tacosViande, category: "tacos" },
-  { id: "tacos-poulet", name: "Tacos Poulet", price: 4000, image: tacosPoulet, category: "tacos" },
-  { id: "tacos-mixte", name: "Tacos Mixte", price: 4000, image: tacosMix, category: "tacos" },
-  { id: "tacos-kfc", name: "Tacos KFC", price: 5000, image: tacosKfc, category: "tacos" },
-  { id: "tacos-pane-miel", name: "Tacos Pané Miel", price: 5500, image: tacosPaneMiel, category: "tacos" },
-  { id: "tacos-cordon-bleu", name: "Tacos Cordon Bleu", price: 5000, image: tacosCordonBleu, category: "tacos" },
-  { id: "tacos-hotdog", name: "Tacos Hotdog", price: 4000, image: tacosHotdog, category: "tacos" },
-  { id: "tacos-merguez", name: "Tacos Merguez", price: 4000, image: tacosMerguez, category: "tacos" },
-  { id: "tacos-crevettes", name: "Tacos Crevettes", price: 7500, image: tacosCrevettes, category: "tacos" },
-  { id: "tacos-saumon", name: "Tacos Saumon", price: 6000, image: tacosSaumon, category: "tacos" },
-  { id: "tacos-corned-beef", name: "Tacos Corned-Beef", price: 4000, image: tacosCorNedBeef, category: "tacos" },
+  // Tacos (with sizes)
+  { id: "tacos-viande", name: "Tacos Viande", price: 4000, image: tacosViande, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
+  { id: "tacos-poulet", name: "Tacos Poulet", price: 4000, image: tacosPoulet, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
+  { id: "tacos-mixte", name: "Tacos Mixte", price: 4000, image: tacosMix, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
+  { id: "tacos-kfc", name: "Tacos KFC", price: 5000, image: tacosKfc, category: "tacos",
+    sizes: [{ name: "M", price: 5000 }, { name: "XL", price: 8000 }, { name: "XXL", price: 12000 }] },
+  { id: "tacos-pane-miel", name: "Tacos Pané Miel", price: 5500, image: tacosPaneMiel, category: "tacos",
+    sizes: [{ name: "M", price: 5500 }, { name: "XL", price: 8000 }, { name: "XXL", price: 12000 }] },
+  { id: "tacos-cordon-bleu", name: "Tacos Cordon Bleu", price: 5000, image: tacosCordonBleu, category: "tacos",
+    sizes: [{ name: "M", price: 5000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 12000 }] },
+  { id: "tacos-hotdog", name: "Tacos Hotdog", price: 4000, image: tacosHotdog, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
+  { id: "tacos-merguez", name: "Tacos Merguez", price: 4000, image: tacosMerguez, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
+  { id: "tacos-crevettes", name: "Tacos Crevettes", price: 7500, image: tacosCrevettes, category: "tacos",
+    sizes: [{ name: "M", price: 7500 }, { name: "XL", price: 12500 }, { name: "XXL", price: 18500 }] },
+  { id: "tacos-saumon", name: "Tacos Saumon", price: 6000, image: tacosSaumon, category: "tacos",
+    sizes: [{ name: "M", price: 6000 }, { name: "XL", price: 8000 }, { name: "XXL", price: 12000 }] },
+  { id: "tacos-corned-beef", name: "Tacos Corned-Beef", price: 4000, image: tacosCorNedBeef, category: "tacos",
+    sizes: [{ name: "M", price: 4000 }, { name: "XL", price: 6500 }, { name: "XXL", price: 10000 }] },
 
   // Menus (tacos + frites + boisson)
   { id: "menu-viande", name: "MENU Tacos Viande", price: 5000, image: tacosViande, category: "menu" },
