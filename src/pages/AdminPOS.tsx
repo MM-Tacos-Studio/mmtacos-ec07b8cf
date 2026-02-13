@@ -157,9 +157,9 @@ const AdminPOS = () => {
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Product Grid */}
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto p-3 pb-28 lg:pb-3">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
             {filteredProducts.map(product => (
               <button
@@ -181,8 +181,8 @@ const AdminPOS = () => {
           </div>
         </div>
 
-        {/* Order Panel */}
-        <div className="w-full lg:w-96 bg-card border-t lg:border-t-0 lg:border-l border-border flex flex-col max-h-[50vh] lg:max-h-full">
+        {/* Order Panel - desktop sidebar */}
+        <div className="hidden lg:flex w-96 bg-card border-l border-border flex-col">
           <div className="flex-1 overflow-y-auto p-3">
             {orderItems.length === 0 ? (
               <div className="text-center text-muted-foreground py-12">
@@ -205,8 +205,6 @@ const AdminPOS = () => {
               </div>
             )}
           </div>
-
-          {/* Footer */}
           <div className="border-t border-border p-3 space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Total</span>
@@ -220,6 +218,34 @@ const AdminPOS = () => {
               {loading ? "..." : "Paiement"}
             </button>
           </div>
+        </div>
+
+        {/* Mobile sticky bottom bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-3 space-y-2 z-40 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+          {orderItems.length > 0 && (
+            <div className="max-h-32 overflow-y-auto space-y-1 mb-2">
+              {orderItems.map(item => (
+                <div key={item.id} className="flex items-center gap-2 text-xs">
+                  <span className="flex-1 truncate text-foreground">{item.qty}× {item.name}</span>
+                  <span className="font-bold text-foreground">{(item.price * item.qty).toLocaleString()}</span>
+                  <button onClick={() => removeItem(item.id)} className="p-0.5 text-destructive">
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">Total</span>
+            <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
+          </div>
+          <button
+            onClick={handlePayment}
+            disabled={orderItems.length === 0 || loading}
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
+          >
+            {loading ? "..." : "Paiement"}
+          </button>
         </div>
       </div>
 
