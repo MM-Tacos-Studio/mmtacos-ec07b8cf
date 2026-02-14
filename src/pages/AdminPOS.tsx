@@ -169,6 +169,20 @@ const AdminPOS = () => {
     );
   }
 
+  // Loading cash state
+  if (cashOpen === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Chargement...</p>
+      </div>
+    );
+  }
+
+  // Cash closed → force cash screen
+  if (!cashOpen) {
+    return <CashSession onBack={() => { checkCashSession(); }} />;
+  }
+
   // POS SCREEN
   return (
     <div className="min-h-screen bg-background flex flex-col">
