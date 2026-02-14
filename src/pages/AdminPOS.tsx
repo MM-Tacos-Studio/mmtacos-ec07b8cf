@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Trash2, LogOut } from "lucide-react";
+import { Search, Trash2, LogOut, History, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { posProducts, type PosProduct } from "@/lib/posProducts";
 import ReceiptPreview, { type OrderItem } from "@/components/admin/ReceiptPreview";
+import OrderHistory from "@/components/admin/OrderHistory";
+import CashSession from "@/components/admin/CashSession";
 
-type Screen = "pos" | "receipt";
+type Screen = "pos" | "receipt" | "history" | "cash";
 
 const AdminPOS = () => {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ const AdminPOS = () => {
   const [orderNumber, setOrderNumber] = useState("001");
   const [loading, setLoading] = useState(false);
   const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
+  const [ticketCode, setTicketCode] = useState("");
 
   // Auth check
   useEffect(() => {
@@ -88,7 +91,7 @@ const AdminPOS = () => {
 
       const { data: { session } } = await supabase.auth.getSession();
 
-      await (supabase.from("orders" as any) as any).insert({
+      const { data: orderData } = await (supabase.from("orders" as any) as any).insert({
         order_number: numStr,
         daily_sequence: seq,
         items: orderItems,
@@ -100,9 +103,10 @@ const AdminPOS = () => {
         amount_paid: total,
         change_amount: 0,
         created_by: session?.user?.id,
-      });
+      }).select("ticket_code").single();
 
       setOrderNumber(numStr);
+      setTicketCode(orderData?.ticket_code || "");
       setScreen("receipt");
     } catch (e) {
       console.error("Error saving order:", e);
@@ -121,6 +125,16 @@ const AdminPOS = () => {
     navigate("/admin/login");
   };
 
+  // HISTORY SCREEN
+  if (screen === "history") {
+    return <OrderHistory onBack={() => setScreen("pos")} />;
+  }
+
+  // CASH SESSION SCREEN
+  if (screen === "cash") {
+    return <CashSession onBack={() => setScreen("pos")} />;
+  }
+
   // RECEIPT SCREEN
   if (screen === "receipt") {
     return (
@@ -128,6 +142,7 @@ const AdminPOS = () => {
         <ReceiptPreview
           items={orderItems}
           orderNumber={orderNumber}
+          ticketCode={ticketCode}
           total={total}
           paymentMethod="especes"
           amountPaid={total}
@@ -152,9 +167,17 @@ const AdminPOS = () => {
             className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
           />
         </div>
-        <button onClick={handleLogout} className="p-2 text-muted-foreground hover:text-foreground">
-          <LogOut className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setScreen("history")} className="p-2 text-muted-foreground hover:text-foreground" title="Historique">
+            <History className="h-4 w-4" />
+          </button>
+          <button onClick={() => setScreen("cash")} className="p-2 text-muted-foreground hover:text-foreground" title="Caisse">
+            <Lock className="h-4 w-4" />
+          </button>
+          <button onClick={handleLogout} className="p-2 text-muted-foreground hover:text-foreground" title="Déconnexion">
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
@@ -173,7 +196,7 @@ const AdminPOS = () => {
                 <div className="p-1.5">
                   <p className="text-xs font-medium text-foreground leading-tight line-clamp-2">{product.name}</p>
                   <p className="text-xs font-bold text-primary">
-                    {product.sizes ? `${product.price.toLocaleString()}+` : product.price.toLocaleString()}
+                    {product.price.toLocaleString()}
                   </p>
                 </div>
               </button>
