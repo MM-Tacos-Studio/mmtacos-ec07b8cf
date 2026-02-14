@@ -18,6 +18,17 @@ const AdminPOS = () => {
   const [loading, setLoading] = useState(false);
   const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
   const [ticketCode, setTicketCode] = useState("");
+  const [cashOpen, setCashOpen] = useState<boolean | null>(null);
+
+  // Check cash session
+  const checkCashSession = async () => {
+    const { data } = await (supabase.from("cash_sessions" as any) as any)
+      .select("id")
+      .eq("status", "open")
+      .limit(1)
+      .maybeSingle();
+    setCashOpen(!!data);
+  };
 
   // Auth check
   useEffect(() => {
@@ -38,6 +49,7 @@ const AdminPOS = () => {
       }
     };
     checkAuth();
+    checkCashSession();
   }, [navigate]);
 
   const filteredProducts = useMemo(() => {
@@ -82,6 +94,11 @@ const AdminPOS = () => {
 
   const handlePayment = async () => {
     if (orderItems.length === 0) return;
+    if (!cashOpen) {
+      alert("Veuillez ouvrir la caisse avant d'enregistrer une commande.");
+      setScreen("cash");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -132,7 +149,7 @@ const AdminPOS = () => {
 
   // CASH SESSION SCREEN
   if (screen === "cash") {
-    return <CashSession onBack={() => setScreen("pos")} />;
+    return <CashSession onBack={() => { checkCashSession(); setScreen("pos"); }} />;
   }
 
   // RECEIPT SCREEN
@@ -235,10 +252,10 @@ const AdminPOS = () => {
             </div>
             <button
               onClick={handlePayment}
-              disabled={orderItems.length === 0 || loading}
+              disabled={orderItems.length === 0 || loading || !cashOpen}
               className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
             >
-              {loading ? "..." : "Paiement"}
+              {loading ? "..." : !cashOpen ? "⚠ Caisse fermée" : "Paiement"}
             </button>
           </div>
         </div>
@@ -264,10 +281,10 @@ const AdminPOS = () => {
           </div>
           <button
             onClick={handlePayment}
-            disabled={orderItems.length === 0 || loading}
+            disabled={orderItems.length === 0 || loading || !cashOpen}
             className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
           >
-            {loading ? "..." : "Paiement"}
+            {loading ? "..." : !cashOpen ? "⚠ Caisse fermée" : "Paiement"}
           </button>
         </div>
       </div>
