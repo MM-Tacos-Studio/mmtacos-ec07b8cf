@@ -12,13 +12,15 @@ export interface OrderItem {
 interface ReceiptPreviewProps {
   items: OrderItem[];
   orderNumber: string;
+  ticketCode?: string;
   total: number;
   paymentMethod: string;
   amountPaid: number;
   onNewOrder: () => void;
+  newOrderLabel?: string;
 }
 
-const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, onNewOrder }: ReceiptPreviewProps) => {
+const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, amountPaid, onNewOrder, newOrderLabel }: ReceiptPreviewProps) => {
   const receiptRef = useRef<HTMLDivElement>(null);
   const now = new Date();
   const dateStr = now.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -57,6 +59,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           <img src="${logo}" class="logo" />
           <div style="font-size:10px;">
             Ticket MM-${orderNumber}<br/>
+            ${ticketCode ? `Code: ${ticketCode}<br/>` : ""}
             ${dateStr} ${timeStr}<br/>
             mmtacos2022@gmail.com<br/>
             +223 84437961<br/>
@@ -100,6 +103,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           <img src={logo} alt="MM Tacos" className="w-16 h-16 mx-auto mb-2 grayscale" />
           <p className="text-[10px]">
             Ticket MM-{orderNumber}<br />
+            {ticketCode && <>Code: {ticketCode}<br /></>}
             {dateStr} {timeStr}<br />
             mmtacos2022@gmail.com<br />
             +223 84437961<br />
@@ -151,7 +155,7 @@ const ReceiptPreview = ({ items, orderNumber, total, paymentMethod, amountPaid, 
           onClick={onNewOrder}
           className="flex-1 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90"
         >
-          Nouvelle commande
+          {newOrderLabel || "Nouvelle commande"}
         </button>
       </div>
     </div>

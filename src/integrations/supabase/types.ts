@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      cash_sessions: {
+        Row: {
+          closed_at: string | null
+          id: string
+          notes: string | null
+          opened_at: string
+          opened_by: string | null
+          session_code: string
+          status: string
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          closed_at?: string | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opened_by?: string | null
+          session_code: string
+          status?: string
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          closed_at?: string | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opened_by?: string | null
+          session_code?: string
+          status?: string
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount_paid: number
@@ -32,6 +68,7 @@ export type Database = {
           subtotal: number
           tax_amount: number
           tax_rate: number
+          ticket_code: string | null
           total: number
         }
         Insert: {
@@ -51,6 +88,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           tax_rate?: number
+          ticket_code?: string | null
           total?: number
         }
         Update: {
@@ -70,6 +108,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number
           tax_rate?: number
+          ticket_code?: string | null
           total?: number
         }
         Relationships: []
