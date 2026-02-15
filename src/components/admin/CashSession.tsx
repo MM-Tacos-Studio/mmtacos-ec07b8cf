@@ -112,33 +112,18 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     fetchClosedSessions();
   };
 
-  const regenerateDailyPDF = async (dateStr: string) => {
-    const dayStart = `${dateStr}T00:00:00.000Z`;
-    const dayEnd = `${dateStr}T23:59:59.999Z`;
-    const { data: dailyOrders } = await (supabase.from("orders" as any) as any)
+  const regenerateSessionPDF = async (session: Session) => {
+    const startTime = session.opened_at;
+    const endTime = session.closed_at || new Date().toISOString();
+    const { data: sessionOrders } = await (supabase.from("orders" as any) as any)
       .select("*")
-      .gte("created_at", dayStart)
-      .lte("created_at", dayEnd)
+      .gte("created_at", startTime)
+      .lte("created_at", endTime)
       .order("created_at", { ascending: true });
 
-    const dailyList = (dailyOrders || []) as any[];
-    const dailyTotal = dailyList.reduce((s: number, o: any) => s + (o.total || 0), 0);
-
-    // Find session code for that date
-    const { data: daySessions } = await (supabase.from("cash_sessions" as any) as any)
-      .select("session_code")
-      .gte("opened_at", dayStart)
-      .lte("opened_at", dayEnd)
-      .order("opened_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const fakeSession: Session = {
-      id: "", session_code: (daySessions as any)?.session_code || "MM-RECAP",
-      opened_at: dayStart, closed_at: dayEnd, status: "closed",
-      total_sales: dailyTotal, total_orders: dailyList.length,
-    };
-    generateDailyPDF(fakeSession, dailyList, dailyTotal);
+    const ordersList = (sessionOrders || []) as any[];
+    const totalSales = ordersList.reduce((s: number, o: any) => s + (o.total || 0), 0);
+    generateDailyPDF(session, ordersList, totalSales);
   };
 
   const generateDailyPDF = (session: Session, orders: any[], totalSales: number) => {
@@ -301,39 +286,34 @@ const CashSession = ({ onBack }: CashSessionProps) => {
           ) : (
             <>
               {/* Table header */}
-              <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+              <div className="grid grid-cols-[2fr_2fr_80px_120px] gap-0 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
                 <span>Session</span>
-                <span>Date</span>
-                <span className="text-right">Commandes</span>
+                <span className="text-center">Date</span>
+                <span className="text-center">Cmd.</span>
                 <span className="text-right">Total</span>
               </div>
               <div className="divide-y divide-border">
                 {closedSessions.map(s => {
                   const openDate = new Date(s.opened_at);
                   const closeDate = s.closed_at ? new Date(s.closed_at) : null;
-                  const dateKey = s.opened_at.split("T")[0];
                   const dateStr = openDate.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
                   const openTime = openDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
                   const closeTime = closeDate ? closeDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
                   return (
                     <div
                       key={s.id}
-                      className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
-                      onClick={() => regenerateDailyPDF(dateKey)}
+                      className="grid grid-cols-[2fr_2fr_80px_120px] gap-0 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => regenerateSessionPDF(s)}
                     >
-                      <div className="min-w-0">
-                        <p className="font-bold text-foreground text-sm">{s.session_code}</p>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm text-foreground">{dateStr}</p>
+                      <p className="font-bold text-foreground text-sm truncate">{s.session_code}</p>
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-foreground">{dateStr}</p>
                         <p className="text-xs text-muted-foreground">{openTime} → {closeTime}</p>
                       </div>
-                      <div className="text-right shrink-0 px-2">
-                        <p className="font-medium text-foreground text-sm">{s.total_orders || 0}</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <p className="font-bold text-foreground text-sm">{(s.total_sales || 0).toLocaleString()} CFA</p>
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-center font-medium text-foreground text-sm">{s.total_orders || 0}</p>
+                      <div className="flex items-center justify-end gap-2">
+                        <p className="font-bold text-foreground text-sm whitespace-nowrap">{(s.total_sales || 0).toLocaleString()} CFA</p>
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                       </div>
                     </div>
                   );
