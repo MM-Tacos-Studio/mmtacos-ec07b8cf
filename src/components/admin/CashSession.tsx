@@ -117,6 +117,23 @@ const CashSession = ({ onBack }: CashSessionProps) => {
   const confirmOpenDay = async (shift: "Matin" | "Soir") => {
     setProcessing(true);
     try {
+      // Close any orphan open days first
+      const { data: orphanDays } = await (supabase.from("operational_days" as any) as any)
+        .select("id")
+        .eq("status", "open");
+      if (orphanDays && orphanDays.length > 0) {
+        for (const od of orphanDays) {
+          // Close orphan shifts
+          await (supabase.from("cash_sessions" as any) as any)
+            .update({ status: "closed", closed_at: new Date().toISOString(), total_sales: 0, total_orders: 0 })
+            .eq("operational_day_id", od.id)
+            .eq("status", "open");
+          await (supabase.from("operational_days" as any) as any)
+            .update({ status: "closed", closed_at: new Date().toISOString(), total_sales: 0, total_orders: 0 })
+            .eq("id", od.id);
+        }
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       const now = new Date();
       const dayCode = `JO-${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,"0")}-${now.getDate().toString().padStart(2,"0")}-${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}`;
@@ -126,7 +143,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
         .select()
         .single();
 
-      if (dayError) { console.error("Error creating day:", dayError); return; }
+      if (dayError) { console.error("Error creating day:", dayError); alert("Erreur création journée."); return; }
 
       if (newDay) {
         const shiftCode = `MM-${now.getFullYear().toString().slice(2)}${(now.getMonth()+1).toString().padStart(2,"0")}${now.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
