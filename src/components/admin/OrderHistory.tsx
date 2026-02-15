@@ -87,8 +87,9 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
       </div>
 
       {/* Table header */}
-      <div className="hidden sm:grid grid-cols-[1fr_1fr_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
-        <span>Réf. / Date</span>
+      <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+        <span>Réf.</span>
+        <span>Date</span>
         <span>N° de reçu</span>
         <span className="text-right">Total</span>
       </div>
@@ -107,12 +108,15 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
               return (
                 <div
                   key={order.id}
-                  className="grid grid-cols-[1fr_1fr_auto] sm:grid-cols-[1fr_1fr_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                  className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedOrder(order)}
                 >
                   <div className="min-w-0">
                     <p className="font-bold text-foreground text-sm">MM-{order.order_number}</p>
-                    <p className="text-xs text-muted-foreground">{dateStr} {timeStr}</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground">{dateStr}</p>
+                    <p className="text-xs text-muted-foreground">{timeStr}</p>
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm text-foreground truncate">{order.ticket_code || "—"}</p>
