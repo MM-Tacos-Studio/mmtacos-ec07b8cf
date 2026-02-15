@@ -156,13 +156,31 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
     try {
       const now = new Date().toISOString();
+      const { data: { session } } = await supabase.auth.getSession();
+      const nowDate = new Date();
+      const shiftCode = `MM-${nowDate.getFullYear().toString().slice(2)}${(nowDate.getMonth()+1).toString().padStart(2,"0")}${nowDate.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
 
-      // Get orders for Matin shift (from shift open to now)
+      // STEP 1: Create Soir shift FIRST (so we never end up with no active shift)
+      const { data: newShift, error: insertErr } = await (supabase.from("cash_sessions" as any) as any).insert({
+        session_code: shiftCode,
+        opened_by: session?.user?.id,
+        status: "open",
+        operational_day_id: currentDay.id,
+        cashier_name: "Soir",
+      }).select().single();
+
+      if (insertErr || !newShift) {
+        console.error("Error creating Soir shift:", insertErr);
+        alert("Erreur lors de la création du service Soir. Réessayez.");
+        setProcessing(false);
+        return;
+      }
+
+      // STEP 2: Now safely close Matin shift
       const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
       const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
 
-      // Close Matin shift with totals
-      const { error: closeErr } = await (supabase.from("cash_sessions" as any) as any)
+      await (supabase.from("cash_sessions" as any) as any)
         .update({
           closed_at: now,
           status: "closed",
@@ -171,30 +189,14 @@ const CashSession = ({ onBack }: CashSessionProps) => {
         })
         .eq("id", currentShift.id);
 
-      if (closeErr) { console.error("Error closing shift:", closeErr); return; }
-
-      // Generate X report for Matin (non-blocking)
+      // Generate X report for Matin (non-blocking, ignore errors)
       try { generateShiftReport(currentShift, shiftOrders, shiftSales); } catch (_) {}
 
-      // Create Soir shift automatically
-      const { data: { session } } = await supabase.auth.getSession();
-      const nowDate = new Date();
-      const shiftCode = `MM-${nowDate.getFullYear().toString().slice(2)}${(nowDate.getMonth()+1).toString().padStart(2,"0")}${nowDate.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
-      
-      const { error: insertErr } = await (supabase.from("cash_sessions" as any) as any).insert({
-        session_code: shiftCode,
-        opened_by: session?.user?.id,
-        status: "open",
-        operational_day_id: currentDay.id,
-        cashier_name: "Soir",
-      });
-
-      if (insertErr) { console.error("Error creating Soir shift:", insertErr); return; }
-
-      // Navigate back to dashboard immediately
+      // Navigate back to dashboard
       onBack();
     } catch (e) {
       console.error("Error during passation:", e);
+      alert("Erreur inattendue. Réessayez.");
     } finally {
       setProcessing(false);
     }
