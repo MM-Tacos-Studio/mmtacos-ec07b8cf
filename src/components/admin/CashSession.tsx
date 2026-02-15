@@ -90,8 +90,8 @@ const CashSession = ({ onBack }: CashSessionProps) => {
   const totalShifts = allDayShifts.length;
   const closedShiftsCount = allDayShifts.filter(s => s.status === "closed").length;
   
-  // Can do passation ONLY if: there's exactly 1 shift (Matin), it's still open, no closed shifts yet
-  const canDoPassation = currentShift && totalShifts === 1 && closedShiftsCount === 0;
+  // Can do passation ONLY if: there's exactly 1 shift, it's Matin, still open, no closed shifts
+  const canDoPassation = currentShift && totalShifts === 1 && closedShiftsCount === 0 && currentShift.cashier_name === "Matin";
   
   // Can close the day: either it's the 2nd shift (Soir), or if Matin wants to close directly without passation
   // But the normal flow is: Matin → passation → Soir → close day
