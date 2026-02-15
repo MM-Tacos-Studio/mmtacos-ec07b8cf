@@ -16,34 +16,87 @@ export type Database = {
     Tables: {
       cash_sessions: {
         Row: {
+          cashier_name: string | null
           closed_at: string | null
           id: string
           notes: string | null
           opened_at: string
           opened_by: string | null
+          operational_day_id: string | null
           session_code: string
           status: string
           total_orders: number | null
           total_sales: number | null
         }
         Insert: {
+          cashier_name?: string | null
           closed_at?: string | null
           id?: string
           notes?: string | null
           opened_at?: string
           opened_by?: string | null
+          operational_day_id?: string | null
           session_code: string
           status?: string
           total_orders?: number | null
           total_sales?: number | null
         }
         Update: {
+          cashier_name?: string | null
           closed_at?: string | null
           id?: string
           notes?: string | null
           opened_at?: string
           opened_by?: string | null
+          operational_day_id?: string | null
           session_code?: string
+          status?: string
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_sessions_operational_day_id_fkey"
+            columns: ["operational_day_id"]
+            isOneToOne: false
+            referencedRelation: "operational_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_days: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          day_code: string
+          id: string
+          opened_at: string
+          opened_by: string | null
+          status: string
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          day_code: string
+          id?: string
+          opened_at?: string
+          opened_by?: string | null
+          status?: string
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          day_code?: string
+          id?: string
+          opened_at?: string
+          opened_by?: string | null
           status?: string
           total_orders?: number | null
           total_sales?: number | null
