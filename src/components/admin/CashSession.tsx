@@ -116,31 +116,37 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
   const confirmOpenDay = async (shift: "Matin" | "Soir") => {
     setProcessing(true);
-    const { data: { session } } = await supabase.auth.getSession();
-    const now = new Date();
-    const dayCode = `JO-${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,"0")}-${now.getDate().toString().padStart(2,"0")}-${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}`;
-    
-    const { data: newDay } = await (supabase.from("operational_days" as any) as any)
-      .insert({ day_code: dayCode, opened_by: session?.user?.id, status: "open" })
-      .select()
-      .single();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const now = new Date();
+      const dayCode = `JO-${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,"0")}-${now.getDate().toString().padStart(2,"0")}-${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}`;
+      
+      const { data: newDay, error: dayError } = await (supabase.from("operational_days" as any) as any)
+        .insert({ day_code: dayCode, opened_by: session?.user?.id, status: "open" })
+        .select()
+        .single();
 
-    if (newDay) {
-      const shiftCode = `MM-${now.getFullYear().toString().slice(2)}${(now.getMonth()+1).toString().padStart(2,"0")}${now.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
-      await (supabase.from("cash_sessions" as any) as any).insert({
-        session_code: shiftCode,
-        opened_by: session?.user?.id,
-        status: "open",
-        operational_day_id: newDay.id,
-        cashier_name: shift,
-      });
+      if (dayError) { console.error("Error creating day:", dayError); return; }
+
+      if (newDay) {
+        const shiftCode = `MM-${now.getFullYear().toString().slice(2)}${(now.getMonth()+1).toString().padStart(2,"0")}${now.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
+        const { error: shiftError } = await (supabase.from("cash_sessions" as any) as any).insert({
+          session_code: shiftCode,
+          opened_by: session?.user?.id,
+          status: "open",
+          operational_day_id: newDay.id,
+          cashier_name: shift,
+        });
+        if (shiftError) { console.error("Error creating shift:", shiftError); return; }
+      }
+
+      setShowShiftPicker(false);
+      onBack();
+    } catch (e) {
+      console.error("Error opening day:", e);
+    } finally {
+      setProcessing(false);
     }
-
-    setShowShiftPicker(false);
-    setProcessing(false);
-    await fetchState();
-    // Go directly to dashboard
-    onBack();
   };
 
   // === PASSATION: close Matin shift, open Soir shift, go to dashboard ===
@@ -148,42 +154,50 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     if (!currentShift || !currentDay || !canDoPassation) return;
     setProcessing(true);
 
-    const now = new Date().toISOString();
+    try {
+      const now = new Date().toISOString();
 
-    // Get orders for Matin shift (from shift open to now)
-    const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
-    const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
+      // Get orders for Matin shift (from shift open to now)
+      const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
+      const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
 
-    // Close Matin shift with totals
-    await (supabase.from("cash_sessions" as any) as any)
-      .update({
-        closed_at: now,
-        status: "closed",
-        total_sales: shiftSales,
-        total_orders: shiftOrders.length,
-      })
-      .eq("id", currentShift.id);
+      // Close Matin shift with totals
+      const { error: closeErr } = await (supabase.from("cash_sessions" as any) as any)
+        .update({
+          closed_at: now,
+          status: "closed",
+          total_sales: shiftSales,
+          total_orders: shiftOrders.length,
+        })
+        .eq("id", currentShift.id);
 
-    // Generate X report for Matin
-    generateShiftReport(currentShift, shiftOrders, shiftSales);
+      if (closeErr) { console.error("Error closing shift:", closeErr); return; }
 
-    // Create Soir shift automatically
-    const { data: { session } } = await supabase.auth.getSession();
-    const nowDate = new Date();
-    const shiftCode = `MM-${nowDate.getFullYear().toString().slice(2)}${(nowDate.getMonth()+1).toString().padStart(2,"0")}${nowDate.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
-    
-    await (supabase.from("cash_sessions" as any) as any).insert({
-      session_code: shiftCode,
-      opened_by: session?.user?.id,
-      status: "open",
-      operational_day_id: currentDay.id,
-      cashier_name: "Soir",
-    });
+      // Generate X report for Matin (non-blocking)
+      try { generateShiftReport(currentShift, shiftOrders, shiftSales); } catch (_) {}
 
-    setProcessing(false);
-    await fetchState();
-    // Go directly to dashboard so Soir can start working
-    onBack();
+      // Create Soir shift automatically
+      const { data: { session } } = await supabase.auth.getSession();
+      const nowDate = new Date();
+      const shiftCode = `MM-${nowDate.getFullYear().toString().slice(2)}${(nowDate.getMonth()+1).toString().padStart(2,"0")}${nowDate.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
+      
+      const { error: insertErr } = await (supabase.from("cash_sessions" as any) as any).insert({
+        session_code: shiftCode,
+        opened_by: session?.user?.id,
+        status: "open",
+        operational_day_id: currentDay.id,
+        cashier_name: "Soir",
+      });
+
+      if (insertErr) { console.error("Error creating Soir shift:", insertErr); return; }
+
+      // Navigate back to dashboard immediately
+      onBack();
+    } catch (e) {
+      console.error("Error during passation:", e);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   // === CLOSE THE FULL DAY (Z de caisse) ===
@@ -191,44 +205,42 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     if (!currentDay) return;
     setProcessing(true);
 
-    const now = new Date().toISOString();
+    try {
+      const now = new Date().toISOString();
 
-    // Close current shift if open
-    if (currentShift) {
-      const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
-      const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
-      await (supabase.from("cash_sessions" as any) as any)
-        .update({ closed_at: now, status: "closed", total_sales: shiftSales, total_orders: shiftOrders.length })
-        .eq("id", currentShift.id);
+      // Close current shift if open
+      if (currentShift) {
+        const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
+        const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
+        await (supabase.from("cash_sessions" as any) as any)
+          .update({ closed_at: now, status: "closed", total_sales: shiftSales, total_orders: shiftOrders.length })
+          .eq("id", currentShift.id);
+      }
+
+      // Get ALL orders for the entire day
+      const allOrders = await getOrdersInRange(currentDay.opened_at, now);
+      const dayTotal = allOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
+
+      const { data: allShifts } = await (supabase.from("cash_sessions" as any) as any)
+        .select("*")
+        .eq("operational_day_id", currentDay.id)
+        .order("opened_at", { ascending: true });
+
+      await (supabase.from("operational_days" as any) as any)
+        .update({ closed_at: now, status: "closed", total_sales: dayTotal, total_orders: allOrders.length })
+        .eq("id", currentDay.id);
+
+      try { generateDayPDF(currentDay, (allShifts || []) as Session[], allOrders, dayTotal); } catch (_) {}
+
+      setCurrentDay(null);
+      setCurrentShift(null);
+      setAllDayShifts([]);
+      fetchClosedDays();
+    } catch (e) {
+      console.error("Error closing day:", e);
+    } finally {
+      setProcessing(false);
     }
-
-    // Get ALL orders for the entire day (from day opening to now)
-    const allOrders = await getOrdersInRange(currentDay.opened_at, now);
-    const dayTotal = allOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
-
-    // Fetch all shifts for this day (after closing current one)
-    const { data: allShifts } = await (supabase.from("cash_sessions" as any) as any)
-      .select("*")
-      .eq("operational_day_id", currentDay.id)
-      .order("opened_at", { ascending: true });
-
-    // Close the day
-    await (supabase.from("operational_days" as any) as any)
-      .update({
-        closed_at: now,
-        status: "closed",
-        total_sales: dayTotal,
-        total_orders: allOrders.length,
-      })
-      .eq("id", currentDay.id);
-
-    generateDayPDF(currentDay, (allShifts || []) as Session[], allOrders, dayTotal);
-
-    setCurrentDay(null);
-    setCurrentShift(null);
-    setAllDayShifts([]);
-    setProcessing(false);
-    fetchClosedDays();
   };
 
   // === SHIFT X REPORT ===
