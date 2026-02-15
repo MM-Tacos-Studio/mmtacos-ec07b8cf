@@ -286,10 +286,10 @@ const CashSession = ({ onBack }: CashSessionProps) => {
           ) : (
             <>
               {/* Table header */}
-              <div className="grid grid-cols-4 gap-0 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+              <div className="grid grid-cols-[3fr_3fr_2fr_3fr] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
                 <span>Session</span>
                 <span className="text-center">Date</span>
-                <span className="text-right">Commandes</span>
+                <span className="text-center">Commandes</span>
                 <span className="text-right">Total</span>
               </div>
               <div className="divide-y divide-border">
@@ -302,7 +302,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
                   return (
                     <div
                       key={s.id}
-                      className="grid grid-cols-4 gap-0 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                      className="grid grid-cols-[3fr_3fr_2fr_3fr] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
                       onClick={() => regenerateSessionPDF(s)}
                     >
                       <p className="font-bold text-foreground text-sm truncate">{s.session_code}</p>
@@ -310,7 +310,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
                         <p className="text-sm font-medium text-foreground">{dateStr}</p>
                         <p className="text-xs text-muted-foreground">{openTime} → {closeTime}</p>
                       </div>
-                      <p className="text-right font-medium text-foreground text-sm">{s.total_orders || 0}</p>
+                      <p className="text-center font-medium text-foreground text-sm">{s.total_orders || 0}</p>
                       <div className="flex items-center justify-end gap-2">
                         <p className="font-bold text-foreground text-sm whitespace-nowrap">{(s.total_sales || 0).toLocaleString()} CFA</p>
                         <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
