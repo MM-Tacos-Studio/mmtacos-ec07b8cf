@@ -87,9 +87,9 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
       </div>
 
       {/* Table header */}
-      <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+      <div className="grid grid-cols-[1fr_100px_1fr_120px] gap-0 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
         <span>Réf.</span>
-        <span>Date</span>
+        <span className="text-center">Date</span>
         <span>N° de reçu</span>
         <span className="text-right">Total</span>
       </div>
@@ -108,22 +108,16 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
               return (
                 <div
                   key={order.id}
-                  className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                  className="grid grid-cols-[1fr_100px_1fr_120px] gap-0 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedOrder(order)}
                 >
-                  <div className="min-w-0">
-                    <p className="font-bold text-foreground text-sm">MM-{order.order_number}</p>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-foreground">{dateStr}</p>
+                  <p className="font-bold text-foreground text-sm">MM-{order.order_number}</p>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-foreground">{dateStr}</p>
                     <p className="text-xs text-muted-foreground">{timeStr}</p>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm text-foreground truncate">{order.ticket_code || "—"}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-bold text-foreground text-sm">{order.total.toLocaleString()} CFA</p>
-                  </div>
+                  <p className="text-sm text-foreground truncate">{order.ticket_code || "—"}</p>
+                  <p className="font-bold text-foreground text-sm text-right">{order.total.toLocaleString()} CFA</p>
                 </div>
               );
             })}
