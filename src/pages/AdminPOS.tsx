@@ -20,14 +20,24 @@ const AdminPOS = () => {
   const [ticketCode, setTicketCode] = useState("");
   const [cashOpen, setCashOpen] = useState<boolean | null>(null);
 
-  // Check cash session
+  // Check if operational day + shift is active
   const checkCashSession = async () => {
-    const { data } = await (supabase.from("cash_sessions" as any) as any)
+    const { data: dayData } = await (supabase.from("operational_days" as any) as any)
       .select("id")
       .eq("status", "open")
       .limit(1)
       .maybeSingle();
-    setCashOpen(!!data);
+    if (!dayData) {
+      setCashOpen(false);
+      return;
+    }
+    const { data: shiftData } = await (supabase.from("cash_sessions" as any) as any)
+      .select("id")
+      .eq("operational_day_id", dayData.id)
+      .eq("status", "open")
+      .limit(1)
+      .maybeSingle();
+    setCashOpen(!!shiftData);
   };
 
   // Auth check
