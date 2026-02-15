@@ -34,6 +34,7 @@ type View = "main" | "history" | "day-detail";
 const CashSession = ({ onBack }: CashSessionProps) => {
   const [currentDay, setCurrentDay] = useState<OperationalDay | null>(null);
   const [currentShift, setCurrentShift] = useState<Session | null>(null);
+  const [allDayShifts, setAllDayShifts] = useState<Session[]>([]);
   const [closedDays, setClosedDays] = useState<OperationalDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -43,6 +44,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
   const [dayShifts, setDayShifts] = useState<Session[]>([]);
 
   const fetchState = async () => {
+    // Get open operational day
     const { data: dayData } = await (supabase.from("operational_days" as any) as any)
       .select("*")
       .eq("status", "open")
@@ -52,6 +54,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     setCurrentDay(dayData as OperationalDay | null);
 
     if (dayData) {
+      // Get open shift for this day
       const { data: shiftData } = await (supabase.from("cash_sessions" as any) as any)
         .select("*")
         .eq("operational_day_id", dayData.id)
@@ -60,8 +63,16 @@ const CashSession = ({ onBack }: CashSessionProps) => {
         .limit(1)
         .maybeSingle();
       setCurrentShift(shiftData as Session | null);
+
+      // Get ALL shifts for this day (to know how many passations happened)
+      const { data: allShifts } = await (supabase.from("cash_sessions" as any) as any)
+        .select("*")
+        .eq("operational_day_id", dayData.id)
+        .order("opened_at", { ascending: true });
+      setAllDayShifts((allShifts || []) as Session[]);
     } else {
       setCurrentShift(null);
+      setAllDayShifts([]);
     }
 
     setLoading(false);
@@ -78,6 +89,17 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
   useEffect(() => { fetchState(); fetchClosedDays(); }, []);
 
+  // How many shifts have been created for this day?
+  const shiftCount = allDayShifts.length;
+  // Was there already a passation? (= shift closed + another started, or shift closed and waiting)
+  const closedShiftsCount = allDayShifts.filter(s => s.status === "closed").length;
+  // Can do passation only if this is the FIRST shift (Matin) and no passation happened yet
+  const canDoPassation = currentShift && shiftCount === 1 && closedShiftsCount === 0;
+  // Current shift name
+  const currentShiftName = currentShift?.cashier_name;
+  // What shift comes next after passation
+  const nextShiftName = currentShiftName === "Matin" ? "Soir" : "Matin";
+
   // === OPEN A NEW OPERATIONAL DAY ===
   const openDay = () => {
     setShowShiftPicker(true);
@@ -87,7 +109,6 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     setProcessing(true);
     const { data: { session } } = await supabase.auth.getSession();
     const now = new Date();
-    // Use timestamp to ensure unique day_code
     const dayCode = `JO-${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,"0")}-${now.getDate().toString().padStart(2,"0")}-${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}`;
     
     const { data: newDay } = await (supabase.from("operational_days" as any) as any)
@@ -111,11 +132,12 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     await fetchState();
   };
 
-  // === END CURRENT SHIFT (Passation / X de caisse) ===
+  // === END CURRENT SHIFT (Passation / X de caisse) — only allowed once ===
   const endShift = async () => {
-    if (!currentShift || !currentDay) return;
+    if (!currentShift || !currentDay || !canDoPassation) return;
     setProcessing(true);
 
+    // Get orders for THIS shift only (between shift open and now)
     const { data: shiftOrders } = await (supabase.from("orders" as any) as any)
       .select("*")
       .gte("created_at", currentShift.opened_at)
@@ -136,32 +158,18 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
     generateShiftReport(currentShift, ordersList, shiftSales);
 
-    setCurrentShift(null);
-    setProcessing(false);
-    await fetchState();
-  };
-
-  // === START NEW SHIFT (after handoff) ===
-  const startNewShift = () => {
-    setShowShiftPicker(true);
-  };
-
-  const confirmNewShift = async (shift: "Matin" | "Soir") => {
-    if (!currentDay) return;
-    setProcessing(true);
+    // Automatically create the next shift (Soir if current was Matin, vice versa)
     const { data: { session } } = await supabase.auth.getSession();
     const now = new Date();
-    const shiftCode = `MM-${now.getFullYear().toString().slice(2)}${(now.getMonth()+1).toString().padStart(2,"0")}${now.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
-
+    const shiftCode2 = `MM-${now.getFullYear().toString().slice(2)}${(now.getMonth()+1).toString().padStart(2,"0")}${now.getDate().toString().padStart(2,"0")}-${Math.floor(Math.random()*9000+1000)}`;
     await (supabase.from("cash_sessions" as any) as any).insert({
-      session_code: shiftCode,
+      session_code: shiftCode2,
       opened_by: session?.user?.id,
       status: "open",
       operational_day_id: currentDay.id,
-      cashier_name: shift,
+      cashier_name: nextShiftName,
     });
 
-    setShowShiftPicker(false);
     setProcessing(false);
     await fetchState();
   };
@@ -171,6 +179,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     if (!currentDay) return;
     setProcessing(true);
 
+    // Close current shift if open
     if (currentShift) {
       const { data: shiftOrders } = await (supabase.from("orders" as any) as any)
         .select("*")
@@ -183,6 +192,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
         .eq("id", currentShift.id);
     }
 
+    // Get ALL orders for the entire day
     const { data: dayOrders } = await (supabase.from("orders" as any) as any)
       .select("*")
       .gte("created_at", currentDay.opened_at)
@@ -209,6 +219,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
     setCurrentDay(null);
     setCurrentShift(null);
+    setAllDayShifts([]);
     setProcessing(false);
     fetchClosedDays();
   };
@@ -452,7 +463,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     );
   }
 
-  // === SHIFT PICKER MODAL (Matin / Soir) ===
+  // === SHIFT PICKER MODAL (only for opening a new day) ===
   if (showShiftPicker) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
@@ -460,7 +471,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
           <button onClick={() => setShowShiftPicker(false)} className="p-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="font-bold text-foreground">{currentDay ? "Nouveau service" : "Ouverture de journée"}</h1>
+          <h1 className="font-bold text-foreground">Ouverture de journée</h1>
         </div>
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="bg-card border border-border rounded-xl p-8 w-full max-w-sm space-y-6">
@@ -473,7 +484,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
             </div>
             <div className="flex gap-4">
               <button
-                onClick={() => currentDay ? confirmNewShift("Matin") : confirmOpenDay("Matin")}
+                onClick={() => confirmOpenDay("Matin")}
                 disabled={processing}
                 className="flex-1 bg-amber-400 hover:bg-amber-500 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
@@ -481,7 +492,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
                 Matin
               </button>
               <button
-                onClick={() => currentDay ? confirmNewShift("Soir") : confirmOpenDay("Soir")}
+                onClick={() => confirmOpenDay("Soir")}
                 disabled={processing}
                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
@@ -508,6 +519,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
       <div className="flex-1 flex items-center justify-center p-6">
         {currentDay && currentShift ? (
+          /* === Caisse ouverte avec un service actif === */
           <div className="bg-card border border-border rounded-xl p-8 w-full max-w-sm text-center space-y-5">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
               <Unlock className="h-8 w-8 text-green-600" />
@@ -523,15 +535,22 @@ const CashSession = ({ onBack }: CashSessionProps) => {
               </p>
             </div>
 
-            <button
-              onClick={endShift}
-              disabled={processing}
-              className="w-full bg-amber-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <UserCheck className="h-4 w-4" />
-              {processing ? "En cours..." : "Fin de service (passation)"}
-            </button>
-            <p className="text-xs text-muted-foreground">Imprime un X de caisse et permet au prochain caissier de prendre le relais</p>
+            {/* Passation button — only if first shift and no passation yet */}
+            {canDoPassation && (
+              <>
+                <button
+                  onClick={endShift}
+                  disabled={processing}
+                  className="w-full bg-amber-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <UserCheck className="h-4 w-4" />
+                  {processing ? "En cours..." : `Passation → ${nextShiftName}`}
+                </button>
+                <p className="text-xs text-muted-foreground">
+                  Imprime le X de caisse et ouvre automatiquement le service {nextShiftName}
+                </p>
+              </>
+            )}
 
             <button
               onClick={closeDay}
@@ -542,34 +561,16 @@ const CashSession = ({ onBack }: CashSessionProps) => {
               {processing ? "Clôture en cours..." : "Clôture de fin de journée"}
             </button>
             <p className="text-xs text-muted-foreground">Génère le Z de caisse avec TOUTES les ventes depuis l'ouverture</p>
-          </div>
-        ) : currentDay && !currentShift ? (
-          <div className="bg-card border border-border rounded-xl p-8 w-full max-w-sm text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto">
-              <UserCheck className="h-8 w-8 text-amber-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-foreground">En attente de passation</h2>
-              <p className="text-sm text-muted-foreground mt-1">La journée {currentDay.day_code} est en cours</p>
-              <p className="text-xs text-muted-foreground">Un nouveau caissier doit prendre le relais</p>
-            </div>
+
             <button
-              onClick={startNewShift}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2"
+              onClick={onBack}
+              className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold"
             >
-              <Unlock className="h-4 w-4" />
-              Démarrer un nouveau service
-            </button>
-            <button
-              onClick={closeDay}
-              disabled={processing}
-              className="w-full bg-destructive text-destructive-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <Lock className="h-4 w-4" />
-              {processing ? "Clôture en cours..." : "Clôture de fin de journée"}
+              Retour au dashboard
             </button>
           </div>
         ) : (
+          /* === Journée fermée === */
           <div className="bg-card border border-border rounded-xl p-8 w-full max-w-sm text-center space-y-6">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
               <Lock className="h-8 w-8 text-muted-foreground" />
