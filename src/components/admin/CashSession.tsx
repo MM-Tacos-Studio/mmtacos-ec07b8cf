@@ -299,35 +299,47 @@ const CashSession = ({ onBack }: CashSessionProps) => {
           {closedSessions.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">Aucune session fermée</p>
           ) : (
-            <div className="divide-y divide-border">
-              {closedSessions.map(s => {
-                const openDate = new Date(s.opened_at);
-                const closeDate = s.closed_at ? new Date(s.closed_at) : null;
-                const dateKey = s.opened_at.split("T")[0];
-                return (
-                  <div
-                    key={s.id}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
-                    onClick={() => regenerateDailyPDF(dateKey)}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-foreground text-sm">{s.session_code}</span>
+            <>
+              {/* Table header */}
+              <div className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+                <span>Session</span>
+                <span>Date</span>
+                <span className="text-right">Commandes</span>
+                <span className="text-right">Total</span>
+              </div>
+              <div className="divide-y divide-border">
+                {closedSessions.map(s => {
+                  const openDate = new Date(s.opened_at);
+                  const closeDate = s.closed_at ? new Date(s.closed_at) : null;
+                  const dateKey = s.opened_at.split("T")[0];
+                  const dateStr = openDate.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+                  const openTime = openDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+                  const closeTime = closeDate ? closeDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
+                  return (
+                    <div
+                      key={s.id}
+                      className="grid grid-cols-[1fr_1fr_auto_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
+                      onClick={() => regenerateDailyPDF(dateKey)}
+                    >
+                      <div className="min-w-0">
+                        <p className="font-bold text-foreground text-sm">{s.session_code}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {openDate.toLocaleDateString("fr-FR")} {openDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                        {closeDate && <> → {closeDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</>}
-                        {" · "}{s.total_orders || 0} commande(s)
-                      </p>
+                      <div className="min-w-0">
+                        <p className="text-sm text-foreground">{dateStr}</p>
+                        <p className="text-xs text-muted-foreground">{openTime} → {closeTime}</p>
+                      </div>
+                      <div className="text-right shrink-0 px-2">
+                        <p className="font-medium text-foreground text-sm">{s.total_orders || 0}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <p className="font-bold text-foreground text-sm">{(s.total_sales || 0).toLocaleString()} CFA</p>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-foreground">{(s.total_sales || 0).toLocaleString()} CFA</p>
-                    </div>
-                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </div>
