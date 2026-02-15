@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Printer, Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import ReceiptPreview, { type OrderItem } from "./ReceiptPreview";
 
 interface Order {
@@ -29,7 +29,7 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
       const { data } = await (supabase.from("orders" as any) as any)
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(200);
       if (data) setOrders(data as Order[]);
       setLoading(false);
     };
@@ -70,10 +70,11 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="font-bold text-foreground">Historique des commandes</h1>
+        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} résultat(s)</span>
       </div>
 
       <div className="p-3">
-        <div className="flex items-center gap-2 bg-card border border-border rounded-lg p-2 mb-3">
+        <div className="flex items-center gap-2 bg-card border border-border rounded-lg p-2 mb-1">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             type="text"
@@ -85,36 +86,39 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pb-3">
+      {/* Table header */}
+      <div className="hidden sm:grid grid-cols-[1fr_1fr_auto] gap-2 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border bg-muted/50">
+        <span>Réf. / Date</span>
+        <span>N° de reçu</span>
+        <span className="text-right">Total</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto">
         {loading ? (
           <p className="text-center text-muted-foreground py-8">Chargement...</p>
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">Aucune commande trouvée</p>
         ) : (
-          <div className="space-y-2">
+          <div className="divide-y divide-border">
             {filtered.map(order => {
               const date = new Date(order.created_at);
+              const dateStr = date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+              const timeStr = date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
               return (
                 <div
                   key={order.id}
-                  className="bg-card border border-border rounded-lg p-3 flex items-center gap-3 cursor-pointer hover:bg-muted/50 transition-colors"
+                  className="grid grid-cols-[1fr_1fr_auto] sm:grid-cols-[1fr_1fr_auto] gap-2 items-center px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedOrder(order)}
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-foreground">#{order.order_number}</span>
-                      {order.ticket_code && (
-                        <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">{order.ticket_code}</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {date.toLocaleDateString("fr-FR")} à {date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                      {" · "}{(order.items as OrderItem[]).reduce((s, i) => s + i.qty, 0)} article(s)
-                    </p>
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground text-sm">MM-{order.order_number}</p>
+                    <p className="text-xs text-muted-foreground">{dateStr} {timeStr}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-foreground">{order.total.toLocaleString()} CFA</p>
-                    <Printer className="h-4 w-4 text-muted-foreground mt-1 ml-auto" />
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground truncate">{order.ticket_code || "—"}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-bold text-foreground text-sm">{order.total.toLocaleString()} CFA</p>
                   </div>
                 </div>
               );
