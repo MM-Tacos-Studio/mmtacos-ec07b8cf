@@ -36,9 +36,9 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
       <head>
         <title>Ticket ${orderNumber}</title>
         <style>
-          @page { size: 80mm auto; margin: 2mm; }
+          @page { size: 80mm 210mm; margin: 2mm; }
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Courier New', monospace; font-size: 12px; width: 76mm; color: #000; }
+          body { font-family: 'Courier New', monospace; font-size: 12px; width: 72.1mm; color: #000; }
           .center { text-align: center; }
           .bold { font-weight: bold; }
           .line { border-top: 1px dashed #000; margin: 4px 0; }
@@ -98,7 +98,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
   return (
     <div className="flex flex-col items-center gap-6 p-6">
       {/* Receipt preview */}
-      <div ref={receiptRef} className="bg-white text-black w-[302px] p-4 shadow-lg rounded font-mono text-xs">
+      <div ref={receiptRef} className="bg-white text-black w-[272px] p-4 shadow-lg rounded font-mono text-xs">
         <div className="text-center">
           <img src={logo} alt="MM Tacos" className="w-16 h-16 mx-auto mb-2 grayscale" />
           <p className="text-[10px]">

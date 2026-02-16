@@ -227,13 +227,15 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     try {
       const now = new Date().toISOString();
 
-      // Close current shift if open
+      // Close current shift if open + generate its X report
       if (currentShift) {
         const shiftOrders = await getOrdersInRange(currentShift.opened_at, now);
         const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
         await (supabase.from("cash_sessions" as any) as any)
           .update({ closed_at: now, status: "closed", total_sales: shiftSales, total_orders: shiftOrders.length })
           .eq("id", currentShift.id);
+        // Generate X report for this shift independently
+        try { generateShiftReport(currentShift, shiftOrders, shiftSales); } catch (_) {}
       }
 
       // Get ALL orders for the entire day
@@ -267,9 +269,9 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     const now = new Date();
     const html = `<!DOCTYPE html><html><head><title>X Caisse - ${shift.cashier_name}</title>
 <style>
-  @page { size: 80mm auto; margin: 5mm; }
+  @page { size: 80mm 210mm; margin: 2mm; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: monospace; font-size: 11px; width: 80mm; }
+  body { font-family: monospace; font-size: 11px; width: 72.1mm; }
   .center { text-align: center; }
   .bold { font-weight: bold; }
   .line { border-top: 1px dashed #000; margin: 6px 0; }
@@ -514,7 +516,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
               <UserCheck className="h-8 w-8 text-primary" />
             </div>
-            <div className="text-center">
+             <div className="text-center">
               <h2 className="text-xl font-bold text-foreground">Quel service ?</h2>
               <p className="text-sm text-muted-foreground mt-1">Choisissez le créneau du caissier</p>
             </div>
@@ -522,18 +524,20 @@ const CashSession = ({ onBack }: CashSessionProps) => {
               <button
                 onClick={() => confirmOpenDay("Matin")}
                 disabled={processing}
-                className="flex-1 bg-amber-400 hover:bg-amber-500 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
                 <Sun className="h-8 w-8" />
                 Matin
+                <span className="text-xs font-normal opacity-80">8h — 00h</span>
               </button>
               <button
                 onClick={() => confirmOpenDay("Soir")}
                 disabled={processing}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-indigo-800 hover:bg-indigo-900 text-white py-6 rounded-xl font-bold text-lg flex flex-col items-center justify-center gap-2 disabled:opacity-50 transition-colors"
               >
                 <Moon className="h-8 w-8" />
                 Soir
+                <span className="text-xs font-normal opacity-80">00h — 6h</span>
               </button>
             </div>
             {processing && <p className="text-center text-sm text-muted-foreground">En cours...</p>}
@@ -559,11 +563,21 @@ const CashSession = ({ onBack }: CashSessionProps) => {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
               <Unlock className="h-8 w-8 text-green-600" />
             </div>
-            <div>
+             <div>
               <h2 className="text-xl font-bold text-foreground">Caisse ouverte</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Caissier <span className="font-medium text-foreground">{currentShift.cashier_name}</span> en service
-              </p>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                {currentShift.cashier_name === "Matin" ? (
+                  <Sun className="h-4 w-4 text-amber-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-indigo-800" />
+                )}
+                <span className={`font-bold ${currentShift.cashier_name === "Matin" ? "text-amber-500" : "text-indigo-800"}`}>
+                  {currentShift.cashier_name}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  ({currentShift.cashier_name === "Matin" ? "8h — 00h" : "00h — 6h"})
+                </span>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">Journée : {currentDay.day_code}</p>
               <p className="text-xs text-muted-foreground">
                 Service depuis {new Date(currentShift.opened_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
