@@ -219,15 +219,25 @@ const AdminPOS = () => {
         </div>
         <div className="flex items-center gap-1">
           {userEmail && (
-            <div className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md mr-1 text-xs font-medium ${
-              currentShiftName === "Matin" 
-                ? "bg-amber-500/10 text-amber-600" 
-                : currentShiftName === "Soir" 
-                  ? "bg-indigo-800/10 text-indigo-700" 
-                  : "bg-muted text-muted-foreground"
-            }`}>
-              <User className="h-3 w-3" />
-              <span className="truncate max-w-[120px]">{userEmail}</span>
+            <div className="hidden sm:flex flex-col items-center mr-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                currentShiftName === "Matin"
+                  ? "bg-amber-500 text-white"
+                  : currentShiftName === "Soir"
+                    ? "bg-indigo-800 text-white"
+                    : "bg-muted text-muted-foreground"
+              }`}>
+                <User className="h-4 w-4" />
+              </div>
+              <span className={`text-[10px] font-semibold mt-0.5 ${
+                currentShiftName === "Matin"
+                  ? "text-amber-600"
+                  : currentShiftName === "Soir"
+                    ? "text-indigo-700"
+                    : "text-muted-foreground"
+              }`}>
+                {currentShiftName || "—"}
+              </span>
             </div>
           )}
           <button onClick={() => setScreen("history")} className="p-2 text-muted-foreground hover:text-foreground" title="Historique">
