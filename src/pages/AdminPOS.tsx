@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Trash2, LogOut, History, Lock } from "lucide-react";
+import { Search, Trash2, LogOut, History, Lock, Sun, Moon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { posProducts, type PosProduct } from "@/lib/posProducts";
 import ReceiptPreview, { type OrderItem } from "@/components/admin/ReceiptPreview";
@@ -19,6 +19,7 @@ const AdminPOS = () => {
   const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
   const [ticketCode, setTicketCode] = useState("");
   const [cashOpen, setCashOpen] = useState<boolean | null>(null);
+  const [currentShiftName, setCurrentShiftName] = useState<string | null>(null);
 
   // Check if operational day + shift is active
   const checkCashSession = async () => {
@@ -32,12 +33,13 @@ const AdminPOS = () => {
       return;
     }
     const { data: shiftData } = await (supabase.from("cash_sessions" as any) as any)
-      .select("id")
+      .select("id, cashier_name")
       .eq("operational_day_id", dayData.id)
       .eq("status", "open")
       .limit(1)
       .maybeSingle();
     setCashOpen(!!shiftData);
+    setCurrentShiftName(shiftData?.cashier_name || null);
   };
 
   // Auth check
@@ -199,6 +201,11 @@ const AdminPOS = () => {
       {/* Top bar */}
       <div className="bg-card border-b border-border p-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-1">
+          {currentShiftName === "Matin" ? (
+            <Sun className="h-5 w-5 text-amber-500 shrink-0" />
+          ) : currentShiftName === "Soir" ? (
+            <Moon className="h-5 w-5 text-indigo-800 shrink-0" />
+          ) : null}
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             type="text"
