@@ -264,31 +264,100 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     }
   };
 
-  // === SHIFT X REPORT ===
+  // === SHIFT X REPORT (A4 détaillé) ===
   const generateShiftReport = (shift: Session, orders: any[], total: number) => {
     const now = new Date();
+    const dateStr = new Date(shift.opened_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+    // Aggregate items by product
+    const itemAgg: Record<string, { name: string; qty: number; total: number }> = {};
+    orders.forEach((o: any) => {
+      const items = (o.items || []) as OrderItem[];
+      items.forEach(item => {
+        if (itemAgg[item.name]) {
+          itemAgg[item.name].qty += item.qty;
+          itemAgg[item.name].total += item.price * item.qty;
+        } else {
+          itemAgg[item.name] = { name: item.name, qty: item.qty, total: item.price * item.qty };
+        }
+      });
+    });
+    const totalQty = Object.values(itemAgg).reduce((s, i) => s + i.qty, 0);
+
+    const itemRows = Object.values(itemAgg).sort((a, b) => a.name.localeCompare(b.name))
+      .map(i => `<tr><td style="padding:6px 16px 6px 32px;border-bottom:1px solid #e5e5e5;">${i.name}</td><td style="padding:6px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${i.qty} Unité(s)</td><td style="padding:6px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${i.total.toLocaleString()}CFA</td></tr>`)
+      .join("");
+
+    const orderRows = orders.map((o: any) => {
+      const oDate = new Date(o.created_at);
+      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
+    }).join("");
+
+    // Payment breakdown
+    const paymentAgg: Record<string, number> = {};
+    orders.forEach((o: any) => {
+      const method = o.payment_method || "Espèces";
+      paymentAgg[method] = (paymentAgg[method] || 0) + (o.total || 0);
+    });
+    const paymentRows = Object.entries(paymentAgg).map(([method, amount]) =>
+      `<tr><td style="padding:4px 16px;">${method} ${shift.session_code}</td><td style="padding:4px 16px;text-align:right;">${amount.toLocaleString()}CFA</td></tr>`
+    ).join("");
+
     const html = `<!DOCTYPE html><html><head><title>X Caisse - ${shift.cashier_name}</title>
 <style>
-  @page { size: 80mm 210mm; margin: 2mm; }
+  @page { size: A4; margin: 15mm; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: monospace; font-size: 11px; width: 72.1mm; }
-  .center { text-align: center; }
-  .bold { font-weight: bold; }
-  .line { border-top: 1px dashed #000; margin: 6px 0; }
-  .row { display: flex; justify-content: space-between; padding: 2px 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; }
+  .header { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 16px; }
+  .header-left { font-size: 11px; color: #444; min-width: 140px; }
+  .header-center { flex: 1; text-align: center; }
+  .header-center h1 { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+  .header-center p { font-size: 12px; color: #444; }
+  .date-box { text-align: right; margin-bottom: 20px; }
+  .date-box span { border: 1px solid #333; padding: 4px 12px; font-size: 12px; }
+  .section-header { background: #e5e5e5; padding: 6px 12px; font-weight: bold; font-size: 13px; margin-top: 20px; }
+  table { width: 100%; border-collapse: collapse; }
+  .total-row td { font-weight: bold; padding: 8px 16px; border-top: 2px solid #333; }
+  .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #999; border-top: 1px solid #ddd; padding-top: 8px; }
 </style></head><body>
-  <div class="center bold" style="font-size:14px;">MM TACOS</div>
-  <div class="center">X DE CAISSE - Fin de Service</div>
-  <div class="line"></div>
-  <div class="row"><span>Caissier :</span><span class="bold">${shift.cashier_name || "—"}</span></div>
-  <div class="row"><span>Session :</span><span>${shift.session_code}</span></div>
-  <div class="row"><span>Ouverture :</span><span>${new Date(shift.opened_at).toLocaleString("fr-FR")}</span></div>
-  <div class="row"><span>Fermeture :</span><span>${now.toLocaleString("fr-FR")}</span></div>
-  <div class="line"></div>
-  <div class="row"><span>Nb commandes :</span><span class="bold">${orders.length}</span></div>
-  <div class="row bold" style="font-size:13px;"><span>TOTAL :</span><span>${total.toLocaleString()} CFA</span></div>
-  <div class="line"></div>
-  <div class="center" style="margin-top:8px;font-size:9px;">par Jamaney Production</div>
+  <div class="header">
+    <div class="header-left">
+      <strong>MM TACOS</strong><br/>
+      Magnambougou près du marché<br/>
+      bamako<br/>
+      Mali
+    </div>
+    <div class="header-center">
+      <h1>Récapitulatif quotidien des ventes X</h1>
+      <p>ID de session : ${shift.session_code}</p>
+      <p>Caissier : <strong>${shift.cashier_name || "—"}</strong></p>
+    </div>
+  </div>
+  <div class="date-box"><span>À la date du ${dateStr}</span></div>
+
+  <div class="section-header">Ventes</div>
+  <table>
+    <tr style="background:#f5f5f5;font-weight:bold;"><td style="padding:6px 16px;">Non catégorisé</td><td style="padding:6px 16px;text-align:right;">${totalQty}</td><td style="padding:6px 16px;text-align:right;">${total.toLocaleString()}CFA</td></tr>
+    ${itemRows}
+    <tr class="total-row"><td>Total</td><td style="text-align:right;">${totalQty}</td><td style="text-align:right;">${total.toLocaleString()}CFA</td></tr>
+  </table>
+
+  <div class="section-header">Paiements</div>
+  <table>
+    ${paymentRows}
+  </table>
+
+  <div class="section-header">Détail des commandes</div>
+  <table>
+    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
+    ${orderRows}
+    <tr class="total-row"><td colspan="2">Total</td><td style="text-align:right;">${total.toLocaleString()}CFA</td></tr>
+  </table>
+
+  <p style="margin-top:16px;padding:6px 16px;"><strong>Contrôle de session</strong></p>
+  <p style="padding:2px 16px;">Total : ${total.toLocaleString()}CFA</p>
+
+  <div class="footer">par Jamaney Production</div>
 </body></html>`;
     const w = window.open("", "_blank");
     if (!w) return;
