@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Trash2, LogOut, History, Lock, Sun, Moon } from "lucide-react";
+import { Search, Trash2, LogOut, History, Lock, Sun, Moon, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { posProducts, type PosProduct } from "@/lib/posProducts";
 import ReceiptPreview, { type OrderItem } from "@/components/admin/ReceiptPreview";
@@ -20,6 +20,7 @@ const AdminPOS = () => {
   const [ticketCode, setTicketCode] = useState("");
   const [cashOpen, setCashOpen] = useState<boolean | null>(null);
   const [currentShiftName, setCurrentShiftName] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Check if operational day + shift is active
   const checkCashSession = async () => {
@@ -50,6 +51,7 @@ const AdminPOS = () => {
         navigate("/admin/login");
         return;
       }
+      setUserEmail(session.user.email || null);
       const { data: roleData } = await supabase
         .from("user_roles" as any)
         .select("role")
@@ -216,6 +218,18 @@ const AdminPOS = () => {
           />
         </div>
         <div className="flex items-center gap-1">
+          {userEmail && (
+            <div className={`hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md mr-1 text-xs font-medium ${
+              currentShiftName === "Matin" 
+                ? "bg-amber-500/10 text-amber-600" 
+                : currentShiftName === "Soir" 
+                  ? "bg-indigo-800/10 text-indigo-700" 
+                  : "bg-muted text-muted-foreground"
+            }`}>
+              <User className="h-3 w-3" />
+              <span className="truncate max-w-[120px]">{userEmail}</span>
+            </div>
+          )}
           <button onClick={() => setScreen("history")} className="p-2 text-muted-foreground hover:text-foreground" title="Historique">
             <History className="h-4 w-4" />
           </button>
