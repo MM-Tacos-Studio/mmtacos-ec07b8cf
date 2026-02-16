@@ -665,7 +665,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
                   {processing ? "En cours..." : "Passation → Soir"}
                 </button>
                 <p className="text-xs text-muted-foreground">
-                  Imprime le X de caisse et ouvre automatiquement le service Soir
+                  Génère le récapitulatif X avec toutes les ventes du service Matin et ouvre le service Soir
                 </p>
               </>
             )}
