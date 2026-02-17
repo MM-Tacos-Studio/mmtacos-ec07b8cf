@@ -81,7 +81,34 @@ const CashSession = ({ onBack }: CashSessionProps) => {
       .eq("status", "closed")
       .order("closed_at", { ascending: false })
       .limit(50);
-    setClosedDays((data || []) as OperationalDay[]);
+    
+    // Compute real totals from shifts for each day
+    const days = (data || []) as OperationalDay[];
+    if (days.length > 0) {
+      const dayIds = days.map(d => d.id);
+      const { data: allShifts } = await (supabase.from("cash_sessions" as any) as any)
+        .select("operational_day_id, total_sales, total_orders")
+        .in("operational_day_id", dayIds);
+      
+      if (allShifts) {
+        const shiftsByDay: Record<string, { sales: number; orders: number }> = {};
+        (allShifts as any[]).forEach((s: any) => {
+          const dayId = s.operational_day_id;
+          if (!shiftsByDay[dayId]) shiftsByDay[dayId] = { sales: 0, orders: 0 };
+          shiftsByDay[dayId].sales += s.total_sales || 0;
+          shiftsByDay[dayId].orders += s.total_orders || 0;
+        });
+        days.forEach(d => {
+          const agg = shiftsByDay[d.id];
+          if (agg) {
+            d.total_sales = agg.sales;
+            d.total_orders = agg.orders;
+          }
+        });
+      }
+    }
+    
+    setClosedDays(days);
   };
 
   useEffect(() => { fetchState(); fetchClosedDays(); }, []);
@@ -508,11 +535,17 @@ const CashSession = ({ onBack }: CashSessionProps) => {
               );
             })
           )}
-          <div className="bg-muted rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground">Total journée</p>
-            <p className="text-xl font-bold text-foreground">{(selectedDay.total_sales || 0).toLocaleString()} CFA</p>
-            <p className="text-xs text-muted-foreground">{selectedDay.total_orders || 0} commandes</p>
-          </div>
+          {(() => {
+            const computedSales = dayShifts.reduce((s, sh) => s + (sh.total_sales || 0), 0);
+            const computedOrders = dayShifts.reduce((s, sh) => s + (sh.total_orders || 0), 0);
+            return (
+              <div className="bg-muted rounded-lg p-4 text-center">
+                <p className="text-sm text-muted-foreground">Total journée</p>
+                <p className="text-xl font-bold text-foreground">{computedSales.toLocaleString()} CFA</p>
+                <p className="text-xs text-muted-foreground">{computedOrders} commandes</p>
+              </div>
+            );
+          })()}
         </div>
       </div>
     );

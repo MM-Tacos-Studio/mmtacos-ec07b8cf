@@ -278,9 +278,9 @@ const AdminPOS = () => {
 
         {/* Order Panel - desktop sidebar */}
         <div className="hidden lg:flex w-96 bg-card border-l border-border flex-col">
-          <div className="flex-1 overflow-y-auto p-3">
+          <div className="overflow-y-auto p-3" style={{ maxHeight: 'calc(100vh - 160px)' }}>
             {orderItems.length === 0 ? (
-              <div className="text-center text-muted-foreground py-12">
+              <div className="text-center text-muted-foreground py-4">
                 <p className="text-sm">Commencez à ajouter des produits</p>
               </div>
             ) : (
