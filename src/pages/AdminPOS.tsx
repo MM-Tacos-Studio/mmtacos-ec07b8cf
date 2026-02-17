@@ -254,7 +254,7 @@ const AdminPOS = () => {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Product Grid */}
-        <div className="flex-1 overflow-y-auto p-3 pb-28 lg:pb-3">
+        <div className="flex-1 overflow-y-auto p-3 pb-28 lg:pb-3 overscroll-contain">
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
             {filteredProducts.map(product => (
               <button

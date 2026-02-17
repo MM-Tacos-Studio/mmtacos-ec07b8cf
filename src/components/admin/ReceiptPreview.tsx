@@ -52,7 +52,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
           .summary-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
           .total-row { font-weight: bold; font-size: 15px; }
           .footer { font-size: 11px; text-align: center; margin-top: 12px; line-height: 1.5; }
-          .generator { font-size: 10px; text-align: center; margin-top: 14px; color: #666; font-weight: bold; }
+          .generator { font-family: Arial, Helvetica, sans-serif; font-size: 12px; text-align: center; margin-top: 14px; color: #000; font-weight: bold; letter-spacing: 0.5px; }
         </style>
       </head>
       <body>
@@ -145,7 +145,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
           Magnambougou près du marché, Bamako<br />
           mmtacosm2022@gmail.com
         </div>
-        <p className="text-center text-[9px] text-gray-400 mt-3 font-bold">par Jamaney Production</p>
+        <p className="text-center text-[10px] text-gray-600 mt-3 font-bold" style={{ fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.5px' }}>par Jamaney Production</p>
       </div>
 
       {/* Payment success */}
