@@ -36,28 +36,29 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
       <head>
         <title>Ticket ${orderNumber}</title>
         <style>
-          @page { size: 80mm 210mm; margin: 2mm; }
+          @page { size: 80mm auto; margin: 2mm; }
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Courier New', monospace; font-size: 12px; width: 72.1mm; color: #000; }
+          body { font-family: 'Courier New', monospace; font-size: 13px; width: 72.1mm; color: #000; line-height: 1.5; }
           .center { text-align: center; }
           .bold { font-weight: bold; }
-          .line { border-top: 1px dashed #000; margin: 4px 0; }
-          .row { display: flex; justify-content: space-between; padding: 1px 0; }
-          .logo { width: 60px; height: 60px; margin: 0 auto 4px; display: block; }
-          .ticket-num { font-size: 24px; font-weight: bold; text-align: center; margin: 6px 0; }
-          .item-row { display: flex; gap: 6px; padding: 2px 0; }
-          .item-qty { width: 20px; text-align: right; flex-shrink: 0; }
-          .item-name { flex: 1; }
-          .item-price { text-align: right; white-space: nowrap; }
-          .total-row { font-weight: bold; font-size: 14px; }
-          .footer { font-size: 10px; text-align: center; margin-top: 8px; }
-          .generator { font-size: 9px; text-align: center; margin-top: 12px; color: #666; }
+          .line { border-top: 1px dashed #000; margin: 8px 0; }
+          .row { display: flex; justify-content: space-between; padding: 3px 0; }
+          .logo { width: 70px; height: 70px; margin: 0 auto 8px; display: block; }
+          .header-info { font-size: 12px; line-height: 1.6; margin-bottom: 4px; }
+          .ticket-num { font-size: 28px; font-weight: bold; text-align: center; margin: 10px 0; }
+          .item-block { padding: 6px 0; }
+          .item-main { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; }
+          .item-detail { font-size: 11px; color: #444; padding-left: 20px; margin-top: 1px; }
+          .summary-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+          .total-row { font-weight: bold; font-size: 15px; }
+          .footer { font-size: 11px; text-align: center; margin-top: 12px; line-height: 1.5; }
+          .generator { font-size: 10px; text-align: center; margin-top: 14px; color: #666; font-weight: bold; }
         </style>
       </head>
       <body>
         <div class="center">
           <img src="${logo}" class="logo" />
-          <div style="font-size:10px;">
+          <div class="header-info">
             Ticket MM-${orderNumber}<br/>
             ${ticketCode ? `Code: ${ticketCode}<br/>` : ""}
             ${dateStr} ${timeStr}<br/>
@@ -69,17 +70,22 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
         </div>
         <div class="line"></div>
         ${items.map(item => `
-          <div class="item-row">
-            <span class="item-qty">${item.qty}</span>
-            <span class="item-name">${item.name}</span>
-            <span class="item-price">${(item.price * item.qty).toLocaleString()} CFA</span>
+          <div class="item-block">
+            <div class="item-main">
+              <span>${item.qty} &nbsp; ${item.name}</span>
+              <span>${(item.price * item.qty).toLocaleString()} CFA</span>
+            </div>
+            ${item.qty > 1 ? `<div class="item-detail">${item.price.toLocaleString()} CFA / Unité(s)</div>` : ""}
           </div>
         `).join("")}
         <div class="line"></div>
-        <div class="row total-row"><span>Total</span><span>${total.toLocaleString()} CFA</span></div>
+        <div class="summary-row"><span>Sous-total</span><span>${total.toLocaleString()} CFA</span></div>
+        <div class="summary-row"><span>Taxe 0 %</span><span>0 CFA</span></div>
+        <div class="summary-row total-row"><span>Total</span><span>${total.toLocaleString()} CFA</span></div>
+        <div class="summary-row"><span>Espèces</span><span>${amountPaid.toLocaleString()} CFA</span></div>
         <div class="line"></div>
         <div class="footer">
-          MM TACOS<br/>
+          <strong>MM TACOS</strong><br/>
           Magnambougou près du marché, Bamako<br/>
           mmtacosm2022@gmail.com
         </div>
@@ -115,24 +121,31 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
         <div className="border-t border-dashed border-gray-400 my-2" />
 
         {items.map((item) => (
-          <div key={item.id} className="flex gap-1 py-0.5">
-            <span className="w-5 text-right shrink-0">{item.qty}</span>
-            <span className="flex-1">{item.name}</span>
-            <span className="text-right whitespace-nowrap">{(item.price * item.qty).toLocaleString()} CFA</span>
+          <div key={item.id} className="py-1">
+            <div className="flex justify-between font-bold text-xs">
+              <span>{item.qty} &nbsp; {item.name}</span>
+              <span className="whitespace-nowrap">{(item.price * item.qty).toLocaleString()} CFA</span>
+            </div>
+            {item.qty > 1 && (
+              <p className="text-[10px] text-gray-500 pl-5">{item.price.toLocaleString()} CFA / Unité(s)</p>
+            )}
           </div>
         ))}
 
         <div className="border-t border-dashed border-gray-400 my-2" />
 
-        <div className="flex justify-between font-bold text-sm"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
+        <div className="flex justify-between text-xs py-0.5"><span>Sous-total</span><span>{total.toLocaleString()} CFA</span></div>
+        <div className="flex justify-between text-xs py-0.5"><span>Taxe 0 %</span><span>0 CFA</span></div>
+        <div className="flex justify-between font-bold text-sm py-1"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
+        <div className="flex justify-between text-xs py-0.5"><span>Espèces</span><span>{amountPaid.toLocaleString()} CFA</span></div>
 
         <div className="border-t border-dashed border-gray-400 my-2" />
         <div className="text-center text-[10px]">
-          MM TACOS<br />
+          <strong>MM TACOS</strong><br />
           Magnambougou près du marché, Bamako<br />
           mmtacosm2022@gmail.com
         </div>
-        <p className="text-center text-[9px] text-gray-400 mt-3">par Jamaney Production</p>
+        <p className="text-center text-[9px] text-gray-400 mt-3 font-bold">par Jamaney Production</p>
       </div>
 
       {/* Payment success */}
