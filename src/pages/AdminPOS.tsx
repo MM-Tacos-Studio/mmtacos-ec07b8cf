@@ -14,7 +14,8 @@ const AdminPOS = () => {
   const [search, setSearch] = useState("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [screen, setScreen] = useState<Screen>("pos");
-  const [orderNumber, setOrderNumber] = useState("001");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [nextOrderNumber, setNextOrderNumber] = useState("...");
   const [loading, setLoading] = useState(false);
   const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
   const [ticketCode, setTicketCode] = useState("");
@@ -23,6 +24,12 @@ const AdminPOS = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Check if operational day + shift is active
+  const fetchNextOrderNumber = async () => {
+    const { data: seqData } = await supabase.rpc("get_next_daily_sequence" as any);
+    const seq = (seqData as number) || 1;
+    setNextOrderNumber(seq.toString().padStart(3, "0"));
+  };
+
   const checkCashSession = async () => {
     const { data: dayData } = await (supabase.from("operational_days" as any) as any)
       .select("id")
@@ -64,6 +71,7 @@ const AdminPOS = () => {
     };
     checkAuth();
     checkCashSession();
+    fetchNextOrderNumber();
   }, [navigate]);
 
   const filteredProducts = useMemo(() => {
@@ -138,6 +146,7 @@ const AdminPOS = () => {
 
       setOrderNumber(numStr);
       setTicketCode(orderData?.ticket_code || "");
+      fetchNextOrderNumber();
       setScreen("receipt");
     } catch (e) {
       console.error("Error saving order:", e);
@@ -307,7 +316,7 @@ const AdminPOS = () => {
             </div>
           {orderItems.length > 0 && (
             <div className="text-center py-2">
-              <span className="text-4xl font-black text-foreground">{orderNumber}</span>
+              <span className="text-4xl font-black text-foreground">{nextOrderNumber}</span>
               <p className="text-xs text-muted-foreground">N° commande en cours</p>
             </div>
           )}
@@ -342,7 +351,7 @@ const AdminPOS = () => {
         </div>
         {orderItems.length > 0 && (
           <div className="text-center py-1">
-            <span className="text-2xl font-black text-foreground">{orderNumber}</span>
+            <span className="text-2xl font-black text-foreground">{nextOrderNumber}</span>
           </div>
         )}
         <button
