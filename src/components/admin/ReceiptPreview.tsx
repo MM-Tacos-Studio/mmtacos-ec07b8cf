@@ -30,6 +30,14 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
   const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 
   const handlePrint = () => {
+    // Generate QR code as data URL
+    const qrCanvas = document.querySelector('.receipt-qr-code svg');
+    let qrDataUrl = '';
+    if (qrCanvas) {
+      const svgData = new XMLSerializer().serializeToString(qrCanvas);
+      qrDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+    }
+
     const printWindow = window.open("", "_blank", "width=302,height=600");
     if (!printWindow) return;
 
@@ -100,6 +108,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
         <div class="social-msg">Merci de nous suivre sur les réseaux sociaux</div>
         <div class="qr-section">
           <p class="qr-text">Désormais vous pouvez commander à partir du site</p>
+          ${qrDataUrl ? `<img src="${qrDataUrl}" style="width:100px;height:100px;margin:8px auto;" />` : ''}
           <p class="qr-text" style="font-weight:bold;">www.mmtacosbamako.com</p>
         </div>
         <div class="generator">par Jamaney Production</div>
@@ -162,7 +171,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
 
           <div className="border-t border-dashed border-gray-400 my-2" />
           <p className="text-center text-[10px] italic text-gray-600">Merci de nous suivre sur les réseaux sociaux</p>
-          <div className="flex flex-col items-center mt-2">
+          <div className="flex flex-col items-center mt-2 receipt-qr-code">
             <p className="text-[9px] text-gray-500 mb-1">Commandez sur le site</p>
             <QRCodeSVG value={SITE_URL} size={80} />
             <p className="text-[9px] font-bold mt-1">www.mmtacosbamako.com</p>
