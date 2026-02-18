@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Lock, Unlock, FileText, ChevronRight, UserCheck, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Lock, Unlock, FileText, ChevronRight, UserCheck, Sun, Moon, Download } from "lucide-react";
 import type { OrderItem } from "./ReceiptPreview";
 
 interface CashSessionProps {
@@ -482,6 +482,15 @@ const CashSession = ({ onBack }: CashSessionProps) => {
     generateDayPDF(day, (dayShiftsData || []) as Session[], ordersList, totalSales);
   };
 
+  // === REGENERATE SHIFT X REPORT FROM HISTORY ===
+  const regenerateShiftReport = async (shift: Session) => {
+    const startTime = shift.opened_at;
+    const endTime = shift.closed_at || new Date().toISOString();
+    const shiftOrders = await getOrdersInRange(startTime, endTime);
+    const shiftSales = shiftOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
+    generateShiftReport(shift, shiftOrders, shiftSales);
+  };
+
   const fetchDayDetail = async (day: OperationalDay) => {
     const { data } = await (supabase.from("cash_sessions" as any) as any)
       .select("*")
@@ -524,7 +533,18 @@ const CashSession = ({ onBack }: CashSessionProps) => {
                       <UserCheck className="h-4 w-4 text-primary" />
                       <span className="font-bold text-foreground">{s.cashier_name || "Caissier"}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">{s.session_code}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{s.session_code}</span>
+                      {s.status === "closed" && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); regenerateShiftReport(s); }}
+                          className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                          title={`Voir le récap ${s.cashier_name}`}
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{openTime} → {closeTime}</span>

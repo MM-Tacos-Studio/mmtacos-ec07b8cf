@@ -305,35 +305,12 @@ const AdminPOS = () => {
               <span className="text-sm text-muted-foreground">Total</span>
               <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
             </div>
-            <button
-              onClick={handlePayment}
-              disabled={orderItems.length === 0 || loading || !cashOpen}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
-            >
-              {loading ? "..." : !cashOpen ? "⚠ Caisse fermée" : "Paiement"}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile sticky bottom bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-3 space-y-2 z-40 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
           {orderItems.length > 0 && (
-            <div className="max-h-32 overflow-y-auto space-y-1 mb-2">
-              {orderItems.map(item => (
-                <div key={item.id} className="flex items-center gap-2 text-xs">
-                  <span className="flex-1 truncate text-foreground">{item.qty}× {item.name}</span>
-                  <span className="font-bold text-foreground">{(item.price * item.qty).toLocaleString()}</span>
-                  <button onClick={() => removeItem(item.id)} className="p-0.5 text-destructive">
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+            <div className="text-center py-2">
+              <span className="text-4xl font-black text-foreground">{orderNumber}</span>
+              <p className="text-xs text-muted-foreground">N° commande en cours</p>
             </div>
           )}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Total</span>
-            <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
-          </div>
           <button
             onClick={handlePayment}
             disabled={orderItems.length === 0 || loading || !cashOpen}
@@ -342,6 +319,40 @@ const AdminPOS = () => {
             {loading ? "..." : !cashOpen ? "⚠ Caisse fermée" : "Paiement"}
           </button>
         </div>
+      </div>
+
+      {/* Mobile sticky bottom bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border p-3 space-y-2 z-40 shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
+        {orderItems.length > 0 && (
+          <div className="max-h-32 overflow-y-auto space-y-1 mb-2">
+            {orderItems.map(item => (
+              <div key={item.id} className="flex items-center gap-2 text-xs">
+                <span className="flex-1 truncate text-foreground">{item.qty}× {item.name}</span>
+                <span className="font-bold text-foreground">{(item.price * item.qty).toLocaleString()}</span>
+                <button onClick={() => removeItem(item.id)} className="p-0.5 text-destructive">
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">Total</span>
+          <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
+        </div>
+        {orderItems.length > 0 && (
+          <div className="text-center py-1">
+            <span className="text-2xl font-black text-foreground">{orderNumber}</span>
+          </div>
+        )}
+        <button
+          onClick={handlePayment}
+          disabled={orderItems.length === 0 || loading || !cashOpen}
+          className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold disabled:opacity-50"
+        >
+          {loading ? "..." : !cashOpen ? "⚠ Caisse fermée" : "Paiement"}
+        </button>
+      </div>
       </div>
 
       {/* Size Picker Modal */}
