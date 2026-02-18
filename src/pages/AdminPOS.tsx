@@ -172,7 +172,7 @@ const AdminPOS = () => {
 
   // CASH SESSION SCREEN
   if (screen === "cash") {
-    return <CashSession onBack={() => { checkCashSession(); setScreen("pos"); }} />;
+    return <CashSession onBack={() => { checkCashSession(); fetchNextOrderNumber(); setScreen("pos"); }} />;
   }
 
   // RECEIPT SCREEN

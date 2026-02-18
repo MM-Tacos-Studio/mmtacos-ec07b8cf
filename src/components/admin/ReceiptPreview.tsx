@@ -115,83 +115,86 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 p-6">
-      {/* Receipt preview */}
-      <div ref={receiptRef} className="bg-white text-black w-[272px] p-4 shadow-lg rounded font-mono text-xs">
-        <div className="text-center">
-          <img src={logo} alt="MM Tacos" className="w-16 h-16 mx-auto mb-1 grayscale" />
-          <p className="text-2xl font-black tracking-widest mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>MMTACOS</p>
-          <p className="text-[10px]">
-            Ticket MM-{orderNumber}<br />
-            {ticketCode && <>Code: {ticketCode}<br /></>}
-            {dateStr} {timeStr}<br />
-            +223 73 36 01 31 / +223 84 43 79 61<br />
-            Servi par : MM TACOS CAISSE
-          </p>
-          <p className="text-2xl font-bold my-2">{orderNumber}</p>
-        </div>
-
-        <div className="border-t border-dashed border-gray-400 my-2" />
-
-        {items.map((item) => (
-          <div key={item.id} className="py-1">
-            <div className="flex justify-between font-bold text-xs">
-              <span>{item.qty} &nbsp; {item.name}</span>
-              <span className="whitespace-nowrap">{(item.price * item.qty).toLocaleString()} CFA</span>
-            </div>
-            {item.qty > 1 && (
-              <p className="text-[10px] text-gray-500 pl-5">{item.price.toLocaleString()} CFA / Unité(s)</p>
-            )}
+    <div className="min-h-screen flex items-start justify-center p-4 pt-8">
+      <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
+        {/* Receipt preview */}
+        <div ref={receiptRef} className="bg-white text-black w-[272px] p-4 shadow-lg rounded font-mono text-xs shrink-0">
+          <div className="text-center">
+            <img src={logo} alt="MM Tacos" className="w-16 h-16 mx-auto mb-1 grayscale" />
+            <p className="text-2xl font-black tracking-widest mb-2" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>MMTACOS</p>
+            <p className="text-[10px]">
+              Ticket MM-{orderNumber}<br />
+              {ticketCode && <>Code: {ticketCode}<br /></>}
+              {dateStr} {timeStr}<br />
+              +223 73 36 01 31 / +223 84 43 79 61<br />
+              Servi par : MM TACOS CAISSE
+            </p>
+            <p className="text-2xl font-bold my-2">{orderNumber}</p>
           </div>
-        ))}
 
-        <div className="border-t border-dashed border-gray-400 my-2" />
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
-        <div className="flex justify-between text-xs py-0.5"><span>Sous-total</span><span>{total.toLocaleString()} CFA</span></div>
-        <div className="flex justify-between text-xs py-0.5"><span>Taxe 0 %</span><span>0 CFA</span></div>
-        <div className="flex justify-between font-bold text-sm py-1"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
-        <div className="flex justify-between text-xs py-0.5"><span>Espèces</span><span>{amountPaid.toLocaleString()} CFA</span></div>
+          {items.map((item) => (
+            <div key={item.id} className="py-1">
+              <div className="flex justify-between font-bold text-xs">
+                <span>{item.qty} &nbsp; {item.name}</span>
+                <span className="whitespace-nowrap">{(item.price * item.qty).toLocaleString()} CFA</span>
+              </div>
+              {item.qty > 1 && (
+                <p className="text-[10px] text-gray-500 pl-5">{item.price.toLocaleString()} CFA / Unité(s)</p>
+              )}
+            </div>
+          ))}
 
-        <div className="border-t border-dashed border-gray-400 my-2" />
-        <div className="text-center text-[10px]">
-          <strong>MM TACOS</strong><br />
-          Magnambougou près du marché, Bamako<br />
-          mmtacos2022@gmail.com
+          <div className="border-t border-dashed border-gray-400 my-2" />
+
+          <div className="flex justify-between text-xs py-0.5"><span>Sous-total</span><span>{total.toLocaleString()} CFA</span></div>
+          <div className="flex justify-between text-xs py-0.5"><span>Taxe 0 %</span><span>0 CFA</span></div>
+          <div className="flex justify-between font-bold text-sm py-1"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
+          <div className="flex justify-between text-xs py-0.5"><span>Espèces</span><span>{amountPaid.toLocaleString()} CFA</span></div>
+
+          <div className="border-t border-dashed border-gray-400 my-2" />
+          <div className="text-center text-[10px]">
+            <strong>MM TACOS</strong><br />
+            Magnambougou près du marché, Bamako<br />
+            mmtacos2022@gmail.com
+          </div>
+
+          <div className="border-t border-dashed border-gray-400 my-2" />
+          <p className="text-center text-[10px] italic text-gray-600">Merci de nous suivre sur les réseaux sociaux</p>
+          <div className="flex flex-col items-center mt-2">
+            <p className="text-[9px] text-gray-500 mb-1">Commandez sur le site</p>
+            <QRCodeSVG value={SITE_URL} size={80} />
+            <p className="text-[9px] font-bold mt-1">www.mmtacosbamako.com</p>
+          </div>
+
+          <p className="text-center text-[10px] text-gray-600 mt-3 font-bold" style={{ fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.5px' }}>par Jamaney Production</p>
         </div>
 
-        <div className="border-t border-dashed border-gray-400 my-2" />
-        <p className="text-center text-[10px] italic text-gray-600">Merci de nous suivre sur les réseaux sociaux</p>
-        <div className="flex flex-col items-center mt-2">
-          <p className="text-[9px] text-gray-500 mb-1">Commandez sur le site</p>
-          <QRCodeSVG value={SITE_URL} size={80} />
-          <p className="text-[9px] font-bold mt-1">www.mmtacosbamako.com</p>
+        {/* Right panel: status + actions */}
+        <div className="flex flex-col gap-4 w-full max-w-xs">
+          {/* Payment success */}
+          <div className="bg-green-100 text-green-800 p-6 rounded-xl text-center">
+            <div className="text-3xl mb-2">✅</div>
+            <p className="font-bold text-lg">Paiement réussi</p>
+            <p className="text-2xl font-black mt-1">{total.toLocaleString()} CFA</p>
+          </div>
+
+          {/* Actions stacked */}
+          <button
+            onClick={handlePrint}
+            className="flex items-center justify-center gap-2 bg-muted text-foreground py-4 rounded-xl font-medium hover:bg-muted/80 text-base"
+          >
+            <Printer className="h-5 w-5" />
+            Imprimer
+          </button>
+          <button
+            onClick={onNewOrder}
+            className="bg-primary text-primary-foreground py-4 rounded-xl font-bold hover:bg-primary/90 text-base"
+          >
+            {newOrderLabel || "Nouvelle commande"}
+          </button>
         </div>
-
-        <p className="text-center text-[10px] text-gray-600 mt-3 font-bold" style={{ fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.5px' }}>par Jamaney Production</p>
-      </div>
-
-      {/* Payment success */}
-      <div className="bg-green-100 text-green-800 p-4 rounded-lg text-center w-full max-w-sm">
-        <div className="text-2xl mb-1">✅</div>
-        <p className="font-bold">Paiement réussi</p>
-        <p className="text-xl font-bold">{total.toLocaleString()} CFA</p>
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-3 w-full max-w-sm">
-        <button
-          onClick={handlePrint}
-          className="flex-1 flex items-center justify-center gap-2 bg-muted text-foreground py-3 rounded-lg font-medium hover:bg-muted/80"
-        >
-          <Printer className="h-4 w-4" />
-          Imprimer
-        </button>
-        <button
-          onClick={onNewOrder}
-          className="flex-1 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90"
-        >
-          {newOrderLabel || "Nouvelle commande"}
-        </button>
       </div>
     </div>
   );
