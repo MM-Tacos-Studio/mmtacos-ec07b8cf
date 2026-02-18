@@ -70,7 +70,7 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h1 className="font-bold text-foreground">Historique des commandes</h1>
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} résultat(s)</span>
+        <span className="text-xs text-muted-foreground ml-auto">{loading ? "..." : `${filtered.length} résultat(s)`}</span>
       </div>
 
       <div className="p-3">
