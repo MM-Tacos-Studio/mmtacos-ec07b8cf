@@ -7,12 +7,14 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPOS from "./pages/AdminPOS";
+import NetworkStatus from "./components/NetworkStatus";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <NetworkStatus />
       <Toaster />
       <Sonner />
       <BrowserRouter>
