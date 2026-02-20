@@ -10,10 +10,9 @@ export function useIsNativeApp(): boolean {
   useEffect(() => {
     // Capacitor injects a global object when running in native mode
     const win = window as any;
-    const native =
-      !!win.Capacitor?.isNativePlatform?.() ||
-      !!win.Capacitor?.isPluginAvailable;
-    setIsNative(native);
+    const fromCapacitor = !!win.Capacitor?.isNativePlatform?.();
+    const fromQueryParam = new URLSearchParams(window.location.search).get("native") === "true";
+    setIsNative(fromCapacitor || fromQueryParam);
   }, []);
 
   return isNative;
