@@ -13,15 +13,17 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import DeliveryModeModal from "@/components/DeliveryModeModal";
 import { useDeliveryMode } from "@/hooks/useDeliveryMode";
+import { useIsNativeApp } from "@/hooks/useIsNativeApp";
 
 import promoBanner from "@/assets/promo-banner-1.jpg";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { deliveryMode, deliveryAddress, showModeModal, setDeliveryMode, handleViewMenu } = useDeliveryMode();
+  const isNativeApp = useIsNativeApp();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${isNativeApp ? "pt-[env(safe-area-inset-top)]" : ""}`}>
       {/* Top Bar with delivery mode indicator */}
       <TopBar 
         deliveryMode={deliveryMode} 
@@ -62,8 +64,8 @@ const Index = () => {
       {/* Trust Section - Before Footer */}
       <TrustSection />
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer - Hidden in native app */}
+      {!isNativeApp && <Footer />}
 
       {/* Scroll to Top Button */}
       <ScrollToTop />
