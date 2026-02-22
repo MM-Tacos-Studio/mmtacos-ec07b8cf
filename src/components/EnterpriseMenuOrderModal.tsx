@@ -108,7 +108,7 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
 
       if (error) throw error;
 
-      const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(buildWhatsAppMessage())}`;
+      const whatsappUrl = `https://wa.me/22383962830?text=${encodeURIComponent(buildWhatsAppMessage())}`;
       window.open(whatsappUrl, "_blank");
 
       toast.success("Commande envoyée ! Redirection vers WhatsApp...");
