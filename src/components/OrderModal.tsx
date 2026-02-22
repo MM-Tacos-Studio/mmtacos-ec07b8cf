@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { Plus, Minus, MessageCircle } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Phone } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { Taco, TacoSize } from "./TacosSection";
 
 // Import supplement images
@@ -35,7 +37,6 @@ interface OrderModalProps {
 }
 
 const supplements: Supplement[] = [
-  // Suppléments (ordered: fromage, frites, then others)
   { id: "fromage-fondant", name: "Fromage fondant", price: 500, category: "supplement", image: supplementFromage },
   { id: "frites", name: "Frites croustillantes", price: 500, category: "supplement", image: supplementFrites },
   { id: "ananas", name: "Tranche d'ananas", price: 500, category: "supplement", image: supplementAnanas },
@@ -44,7 +45,6 @@ const supplements: Supplement[] = [
   { id: "jambon", name: "Jambon", price: 500, category: "supplement", image: supplementJambon },
   { id: "oeufs", name: "Œufs", price: 500, category: "supplement", image: supplementOeufs },
   { id: "hotdog-saucisse", name: "Hotdog saucisse", price: 1000, category: "supplement", image: supplementHotdog },
-  // Boissons
   { id: "boisson", name: "Boisson", price: 500, category: "boisson" },
   { id: "menthe-lait", name: "Menthe au lait", price: 1000, category: "boisson" },
 ];
@@ -56,8 +56,9 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
   const [meatChoice, setMeatChoice] = useState<"viande" | "poulet" | null>(null);
   const [deliveryType, setDeliveryType] = useState<"livraison" | "emporter" | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("+223");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset state when modal opens with new taco
   useEffect(() => {
     if (taco && isOpen) {
       setSelectedSupplements({});
@@ -66,6 +67,8 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
       setMeatChoice(null);
       setDeliveryType(initialDeliveryMode || null);
       setDeliveryAddress(initialDeliveryAddress || "");
+      setPhoneNumber("+223");
+      setIsSubmitting(false);
     }
   }, [taco, isOpen, initialDeliveryMode, initialDeliveryAddress]);
 
@@ -95,39 +98,55 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
     return (basePrice + supplementsTotal) * quantity;
   };
 
-  const handleOrder = () => {
-    // Validation pour Pané Miel et type de commande
-    if (taco.requiresMeatChoice && !meatChoice) {
-      return;
-    }
-    if (!deliveryType) {
-      return;
-    }
-    if (deliveryType === "livraison" && !deliveryAddress.trim()) {
-      return;
-    }
+  const isPhoneValid = () => {
+    const cleaned = phoneNumber.replace(/\s/g, "");
+    return cleaned.length >= 11; // +223 + 8 digits
+  };
+
+  const handleOrder = async () => {
+    if (taco.requiresMeatChoice && !meatChoice) return;
+    if (!deliveryType) return;
+    if (deliveryType === "livraison" && !deliveryAddress.trim()) return;
+    if (!isPhoneValid()) return;
+
+    setIsSubmitting(true);
 
     const supplementsList = Object.entries(selectedSupplements)
       .filter(([_, qty]) => qty > 0)
       .map(([id, qty]) => {
         const supplement = supplements.find((s) => s.id === id);
-        return `${qty}x ${supplement?.name}`;
-      })
-      .join(", ");
+        return { name: supplement?.name, qty, price: supplement?.price };
+      });
 
-    const sizeName = selectedSize ? ` Taille ${selectedSize.name}` : "";
-    const meatText = meatChoice ? ` ${meatChoice === "viande" ? "Viande" : "Poulet"}` : "";
-    const deliveryText = deliveryType === "livraison" 
-      ? `Livraison à ${deliveryAddress.trim()}` 
-      : "Je viendrais récupérer";
+    const orderDetails = {
+      tacoName: taco.name,
+      size: selectedSize?.name || null,
+      meatChoice: meatChoice || null,
+      quantity,
+      supplements: supplementsList,
+      unitPrice: selectedSize?.price || taco.price,
+    };
 
-    const supplementsText = supplementsList ? `\n\nSuppléments : ${supplementsList}` : "";
+    try {
+      const { error } = await supabase.from("client_orders" as any).insert({
+        order_type: "tacos",
+        order_details: orderDetails,
+        phone: phoneNumber.replace(/\s/g, ""),
+        delivery_type: deliveryType,
+        delivery_address: deliveryType === "livraison" ? deliveryAddress.trim() : null,
+        total: calculateTotal(),
+      } as any);
 
-    const message = `Bonjour je voudrais commander :\n\n${quantity}x ${taco.name}${sizeName}${meatText}${supplementsText}\n\n${deliveryText}\n\nTotal : ${calculateTotal().toLocaleString()} FCFA\n\nMerci !\n\n#Commandeviasitemmtacos`;
+      if (error) throw error;
 
-    const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-    handleClose();
+      toast.success("Commande envoyée avec succès ! Nous vous contacterons bientôt.");
+      handleClose();
+    } catch (e) {
+      console.error("Error saving order:", e);
+      toast.error("Erreur lors de l'envoi de la commande. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -137,6 +156,7 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
     setMeatChoice(null);
     setDeliveryType(null);
     setDeliveryAddress("");
+    setPhoneNumber("+223");
     onClose();
   };
 
@@ -362,6 +382,24 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
           )}
         </div>
 
+        {/* Phone Number */}
+        <div className="p-4 bg-muted rounded-lg">
+          <span className="font-bold text-primary mb-3 block flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            Numéro de téléphone *
+          </span>
+          <input
+            type="tel"
+            placeholder="+223 XX XX XX XX"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="w-full p-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
+          />
+          {!isPhoneValid() && phoneNumber.length > 4 && (
+            <p className="text-destructive text-sm mt-2">* Numéro invalide (minimum 8 chiffres après +223)</p>
+          )}
+        </div>
+
         {/* Total & Order Button */}
         <div className="border-t border-border pt-4 mt-4">
           <div className="flex items-center justify-between mb-2">
@@ -371,23 +409,25 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
             </span>
           </div>
           
-          {/* Payment Info */}
           <p className="text-sm text-muted-foreground mb-4 flex items-center gap-1">
             💵 Paiement à la livraison
           </p>
           
           <button
             onClick={handleOrder}
-            disabled={(taco.requiresMeatChoice && !meatChoice) || !deliveryType || (deliveryType === "livraison" && !deliveryAddress.trim())}
-            className="w-full bg-[#25D366] text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
-              shadow-[0_4px_0_0] shadow-[#1da851]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_0_0] hover:shadow-[#1da851]
-              active:translate-y-0 active:shadow-none
-              transition-all duration-150
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0"
+            disabled={
+              (taco.requiresMeatChoice && !meatChoice) || 
+              !deliveryType || 
+              (deliveryType === "livraison" && !deliveryAddress.trim()) || 
+              !isPhoneValid() ||
+              isSubmitting
+            }
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
+              hover:opacity-90 transition-all duration-150
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MessageCircle className="h-5 w-5" />
-            Commander via WhatsApp
+            <ShoppingCart className="h-5 w-5" />
+            {isSubmitting ? "Envoi en cours..." : "Commander"}
           </button>
         </div>
       </DialogContent>

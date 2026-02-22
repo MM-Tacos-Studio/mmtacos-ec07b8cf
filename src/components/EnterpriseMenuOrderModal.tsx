@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, Building2 } from "lucide-react";
+import { ShoppingCart, Building2, Phone } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface EnterpriseMenu {
   id: string;
@@ -32,17 +34,18 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
   const [deliveryType, setDeliveryType] = useState<"livraison" | "emporter" | null>(null);
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("+223");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (menu && isOpen) {
       const half = Math.floor(menu.quantity / 2);
-      setMeatDistribution({
-        viande: menu.quantity - half,
-        poulet: half,
-      });
+      setMeatDistribution({ viande: menu.quantity - half, poulet: half });
       setDeliveryType(initialDeliveryMode || null);
       setDeliveryAddress(initialDeliveryAddress || "");
       setCompanyName("");
+      setPhoneNumber("+223");
+      setIsSubmitting(false);
     }
   }, [menu, isOpen, initialDeliveryMode, initialDeliveryAddress]);
 
@@ -52,28 +55,49 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
     setMeatDistribution((prev) => {
       const newValue = Math.max(0, Math.min(menu.quantity, prev[type] + delta));
       const remaining = menu.quantity - newValue;
-      if (type === "viande") {
-        return { viande: newValue, poulet: remaining };
-      }
-      return { viande: remaining, poulet: newValue };
+      return type === "viande" ? { viande: newValue, poulet: remaining } : { viande: remaining, poulet: newValue };
     });
   };
 
-  const handleOrder = () => {
+  const isPhoneValid = () => {
+    const cleaned = phoneNumber.replace(/\s/g, "");
+    return cleaned.length >= 11;
+  };
+
+  const handleOrder = async () => {
     if (!deliveryType) return;
     if (deliveryType === "livraison" && !deliveryAddress.trim()) return;
+    if (!isPhoneValid()) return;
 
-    const deliveryText = deliveryType === "livraison"
-      ? `Livraison à ${deliveryAddress.trim()}`
-      : "Je viendrais récupérer";
+    setIsSubmitting(true);
 
-    const companyText = companyName.trim() ? `\n\n🏢 Entreprise : ${companyName.trim()}` : "";
+    const orderDetails = {
+      menuQuantity: menu.quantity,
+      meatDistribution,
+      companyName: companyName.trim() || null,
+      pricePerMenu: menu.pricePerMenu,
+    };
 
-    const message = `Bonjour je voudrais commander :\n\n🏢 MENU ENTREPRISE ${menu.quantity} MENUS COMPLETS${companyText}\n\nRépartition :\n• ${meatDistribution.viande}x Tacos Viande\n• ${meatDistribution.poulet}x Tacos Poulet\n\nChaque menu comprend :\n• Tacos (viande ou poulet) + sauce fromagère\n• Frites à l'intérieur + accompagnement\n• Boisson\n\n${deliveryText}\n\nTotal : ${menu.price.toLocaleString()} FCFA\n(${menu.pricePerMenu.toLocaleString()} FCFA/menu)\n\nMerci !\n\n#Commandeviasitemmtacos`;
+    try {
+      const { error } = await supabase.from("client_orders" as any).insert({
+        order_type: "enterprise",
+        order_details: orderDetails,
+        phone: phoneNumber.replace(/\s/g, ""),
+        delivery_type: deliveryType,
+        delivery_address: deliveryType === "livraison" ? deliveryAddress.trim() : null,
+        total: menu.price,
+      } as any);
 
-    const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-    onClose();
+      if (error) throw error;
+
+      toast.success("Commande envoyée avec succès ! Nous vous contacterons bientôt.");
+      onClose();
+    } catch (e) {
+      console.error("Error saving order:", e);
+      toast.error("Erreur lors de l'envoi de la commande. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -90,16 +114,14 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
         <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg">
           <div className="flex justify-between items-center mb-2">
             <span className="font-bold text-lg">{menu.quantity} Menus Complets</span>
-            <span className="text-2xl font-extrabold text-primary">
-              {menu.price.toLocaleString()} FCFA
-            </span>
+            <span className="text-2xl font-extrabold text-primary">{menu.price.toLocaleString()} FCFA</span>
           </div>
           <p className="text-sm text-green-600 font-medium">
             Soit {menu.pricePerMenu.toLocaleString()} FCFA par menu
           </p>
         </div>
 
-        {/* Company Name (Optional) */}
+        {/* Company Name */}
         <div className="p-4 bg-muted rounded-lg">
           <span className="font-bold text-primary mb-3 block">Nom de l'entreprise (optionnel)</span>
           <input
@@ -116,47 +138,23 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
           <span className="font-bold text-primary mb-3 block">
             Répartition viande/poulet ({menu.quantity} tacos)
           </span>
-          
           <div className="space-y-4">
-            {/* Viande */}
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Tacos Viande</span>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleMeatChange("viande", -1)}
-                  className="bg-card w-8 h-8 rounded-full hover:bg-accent transition-colors flex items-center justify-center font-bold"
-                >
-                  -
-                </button>
-                <span className="font-bold text-lg w-8 text-center">{meatDistribution.viande}</span>
-                <button
-                  onClick={() => handleMeatChange("viande", 1)}
-                  className="bg-primary text-primary-foreground w-8 h-8 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center font-bold"
-                >
-                  +
-                </button>
+            {(["viande", "poulet"] as const).map((type) => (
+              <div key={type} className="flex items-center justify-between">
+                <span className="font-medium">Tacos {type === "viande" ? "Viande" : "Poulet"}</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleMeatChange(type, -1)}
+                    className="bg-card w-8 h-8 rounded-full hover:bg-accent transition-colors flex items-center justify-center font-bold"
+                  >-</button>
+                  <span className="font-bold text-lg w-8 text-center">{meatDistribution[type]}</span>
+                  <button
+                    onClick={() => handleMeatChange(type, 1)}
+                    className="bg-primary text-primary-foreground w-8 h-8 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center font-bold"
+                  >+</button>
+                </div>
               </div>
-            </div>
-
-            {/* Poulet */}
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Tacos Poulet</span>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleMeatChange("poulet", -1)}
-                  className="bg-card w-8 h-8 rounded-full hover:bg-accent transition-colors flex items-center justify-center font-bold"
-                >
-                  -
-                </button>
-                <span className="font-bold text-lg w-8 text-center">{meatDistribution.poulet}</span>
-                <button
-                  onClick={() => handleMeatChange("poulet", 1)}
-                  className="bg-primary text-primary-foreground w-8 h-8 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center font-bold"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -167,23 +165,15 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
             <button
               onClick={() => setDeliveryType("livraison")}
               className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all ${
-                deliveryType === "livraison"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-foreground hover:bg-accent"
+                deliveryType === "livraison" ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-accent"
               }`}
-            >
-              Livraison
-            </button>
+            >Livraison</button>
             <button
               onClick={() => setDeliveryType("emporter")}
               className={`flex-1 py-3 px-4 rounded-lg font-bold transition-all text-sm ${
-                deliveryType === "emporter"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card text-foreground hover:bg-accent"
+                deliveryType === "emporter" ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-accent"
               }`}
-            >
-              Je viendrais récupérer
-            </button>
+            >Je viendrais récupérer</button>
           </div>
           {deliveryType === "livraison" && (
             <input
@@ -194,11 +184,27 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
               className="w-full mt-3 p-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
             />
           )}
-          {!deliveryType && (
-            <p className="text-destructive text-sm mt-2">* Veuillez choisir</p>
-          )}
+          {!deliveryType && <p className="text-destructive text-sm mt-2">* Veuillez choisir</p>}
           {deliveryType === "livraison" && !deliveryAddress.trim() && (
             <p className="text-destructive text-sm mt-2">* Veuillez entrer l'adresse</p>
+          )}
+        </div>
+
+        {/* Phone Number */}
+        <div className="p-4 bg-muted rounded-lg">
+          <span className="font-bold text-primary mb-3 block flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            Numéro de téléphone *
+          </span>
+          <input
+            type="tel"
+            placeholder="+223 XX XX XX XX"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="w-full p-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
+          />
+          {!isPhoneValid() && phoneNumber.length > 4 && (
+            <p className="text-destructive text-sm mt-2">* Numéro invalide (minimum 8 chiffres après +223)</p>
           )}
         </div>
 
@@ -206,28 +212,18 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
         <div className="border-t border-border pt-4 mt-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-lg font-bold">Total</span>
-            <span className="text-xl font-bold text-primary">
-              {menu.price.toLocaleString()} FCFA
-            </span>
+            <span className="text-xl font-bold text-primary">{menu.price.toLocaleString()} FCFA</span>
           </div>
-          
-          {/* Payment Info */}
-          <p className="text-sm text-muted-foreground mb-4 flex items-center gap-1">
-            💵 Paiement à la livraison
-          </p>
-          
+          <p className="text-sm text-muted-foreground mb-4 flex items-center gap-1">💵 Paiement à la livraison</p>
           <button
             onClick={handleOrder}
-            disabled={!deliveryType || (deliveryType === "livraison" && !deliveryAddress.trim())}
-            className="w-full bg-[#25D366] text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 
-              shadow-[0_4px_0_0] shadow-[#1da851]
-              hover:-translate-y-0.5 hover:shadow-[0_6px_0_0] hover:shadow-[#1da851]
-              active:translate-y-0 active:shadow-none
-              transition-all duration-150
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0"
+            disabled={!deliveryType || (deliveryType === "livraison" && !deliveryAddress.trim()) || !isPhoneValid() || isSubmitting}
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
+              hover:opacity-90 transition-all duration-150
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MessageCircle className="h-5 w-5" />
-            Commander via WhatsApp
+            <ShoppingCart className="h-5 w-5" />
+            {isSubmitting ? "Envoi en cours..." : "Commander"}
           </button>
         </div>
       </DialogContent>

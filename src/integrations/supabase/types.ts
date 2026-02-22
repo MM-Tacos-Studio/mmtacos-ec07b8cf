@@ -64,6 +64,42 @@ export type Database = {
           },
         ]
       }
+      client_orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          delivery_type: string
+          id: string
+          order_details: Json
+          order_type: string
+          phone: string
+          status: string
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_type: string
+          id?: string
+          order_details?: Json
+          order_type?: string
+          phone: string
+          status?: string
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_type?: string
+          id?: string
+          order_details?: Json
+          order_type?: string
+          phone?: string
+          status?: string
+          total?: number
+        }
+        Relationships: []
+      }
       operational_days: {
         Row: {
           closed_at: string | null
