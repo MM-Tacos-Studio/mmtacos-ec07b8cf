@@ -63,7 +63,42 @@ const ClientOrders = ({ onBack }: ClientOrdersProps) => {
     fetchOrders();
   };
 
+  const playAlertSound = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // Play 3 beeps
+      [0, 0.2, 0.4].forEach((delay) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = "sine";
+        gain.gain.value = 0.3;
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.15);
+      });
+    } catch (e) {
+      console.warn("Audio alert failed:", e);
+    }
+  };
+
+  const showBrowserNotification = (order: ClientOrder) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      const type = orderTypeLabels[order.order_type] || "Commande";
+      new Notification("🛒 Nouvelle commande !", {
+        body: `${type} - ${order.total.toLocaleString()} FCFA\nTel: ${order.phone}`,
+        icon: "/favicon.png",
+      });
+    }
+  };
+
   useEffect(() => {
+    // Request notification permission
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
     fetchOrders();
 
     // Realtime subscription
@@ -73,7 +108,10 @@ const ClientOrders = ({ onBack }: ClientOrdersProps) => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "client_orders" },
         (payload: any) => {
-          setOrders((prev) => [payload.new as ClientOrder, ...prev]);
+          const newOrder = payload.new as ClientOrder;
+          setOrders((prev) => [newOrder, ...prev]);
+          playAlertSound();
+          showBrowserNotification(newOrder);
         }
       )
       .subscribe();
