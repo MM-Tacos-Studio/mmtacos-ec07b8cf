@@ -136,7 +136,14 @@ const AdminPOS = () => {
             });
           }
 
-          setNewClientOrderCount((c) => c + 1);
+          fetchPendingCount();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "client_orders" },
+        () => {
+          fetchPendingCount();
         }
       )
       .subscribe();
@@ -350,10 +357,10 @@ const AdminPOS = () => {
               </span>
             </div>
           )}
-          <button onClick={() => { setScreen("client-orders"); setNewClientOrderCount(0); }} className="p-2 text-muted-foreground hover:text-foreground relative" title="Commandes clients">
+          <button onClick={() => setScreen("client-orders")} className="p-2 text-muted-foreground hover:text-foreground relative" title="Commandes clients">
             <ShoppingBag className="h-4 w-4" />
             {newClientOrderCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                 {newClientOrderCount}
               </span>
             )}
