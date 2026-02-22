@@ -114,6 +114,16 @@ const ClientOrders = ({ onBack }: ClientOrdersProps) => {
           showBrowserNotification(newOrder);
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "client_orders" },
+        (payload: any) => {
+          const updated = payload.new as ClientOrder;
+          setOrders((prev) =>
+            prev.map((o) => (o.id === updated.id ? updated : o))
+          );
+        }
+      )
       .subscribe();
 
     return () => {
