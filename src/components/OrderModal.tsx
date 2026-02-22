@@ -165,7 +165,10 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
 
       // Open WhatsApp with pre-filled message
       const whatsappUrl = `https://wa.me/22383962830?text=${encodeURIComponent(buildWhatsAppMessage())}`;
-      window.open(whatsappUrl, "_blank");
+      const win = window.open(whatsappUrl, "_blank");
+      if (!win) {
+        window.location.href = whatsappUrl;
+      }
 
       toast.success("Commande envoyée ! Redirection vers WhatsApp...");
       handleClose();
