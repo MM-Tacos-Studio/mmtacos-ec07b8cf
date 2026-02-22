@@ -58,7 +58,7 @@ const AdminPOS = () => {
   const fetchPendingCount = async () => {
     const { count } = await (supabase.from("client_orders" as any) as any)
       .select("id", { count: "exact", head: true })
-      .in("status", ["nouvelle", "en_preparation"]);
+      .in("status", ["new", "pending", "nouvelle", "en_preparation"]);
     setNewClientOrderCount(count || 0);
   };
 
