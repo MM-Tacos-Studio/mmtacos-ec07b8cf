@@ -54,35 +54,78 @@ const AdminPOS = () => {
   // Realtime alert for new client orders (works on all admin screens)
   const [newClientOrderCount, setNewClientOrderCount] = useState(0);
 
+  // Fetch pending client orders count on mount
+  const fetchPendingCount = async () => {
+    const { count } = await (supabase.from("client_orders" as any) as any)
+      .select("id", { count: "exact", head: true })
+      .in("status", ["nouvelle", "en_preparation"]);
+    setNewClientOrderCount(count || 0);
+  };
+
+  // Reliable beep using Audio element with base64 WAV
+  const playBeep = () => {
+    try {
+      // Generate a simple WAV beep programmatically
+      const sampleRate = 8000;
+      const duration = 0.15;
+      const freq = 880;
+      const samples = sampleRate * duration;
+      const buffer = new ArrayBuffer(44 + samples * 2);
+      const view = new DataView(buffer);
+      // WAV header
+      const writeString = (offset: number, str: string) => {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      };
+      writeString(0, "RIFF");
+      view.setUint32(4, 36 + samples * 2, true);
+      writeString(8, "WAVE");
+      writeString(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, "data");
+      view.setUint32(40, samples * 2, true);
+      for (let i = 0; i < samples; i++) {
+        const val = Math.sin(2 * Math.PI * freq * i / sampleRate) * 0.8 * 32767;
+        view.setInt16(44 + i * 2, val, true);
+      }
+      const blob = new Blob([buffer], { type: "audio/wav" });
+      const url = URL.createObjectURL(blob);
+      
+      // Play 3 beeps
+      const playOne = (delay: number) => {
+        setTimeout(() => {
+          const audio = new Audio(url);
+          audio.volume = 1.0;
+          audio.play().catch(() => {});
+        }, delay);
+      };
+      playOne(0);
+      playOne(250);
+      playOne(500);
+    } catch (e) {
+      console.warn("Beep failed:", e);
+    }
+  };
+
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission();
     }
+
+    fetchPendingCount();
 
     const channel = supabase
       .channel("pos-client-orders-alert")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "client_orders" },
-        async (payload: any) => {
-          // Play alert sound
-          try {
-            const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-            await ctx.resume();
-            [0, 0.25, 0.5].forEach((delay) => {
-              const osc = ctx.createOscillator();
-              const gain = ctx.createGain();
-              osc.connect(gain);
-              gain.connect(ctx.destination);
-              osc.frequency.value = 880;
-              osc.type = "square";
-              gain.gain.value = 0.5;
-              osc.start(ctx.currentTime + delay);
-              osc.stop(ctx.currentTime + delay + 0.18);
-            });
-          } catch (e) {
-            console.warn("Audio alert failed:", e);
-          }
+        (payload: any) => {
+          playBeep();
 
           // Browser notification
           if ("Notification" in window && Notification.permission === "granted") {
