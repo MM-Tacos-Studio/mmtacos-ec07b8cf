@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, Gift, Truck, MessageCircle, Check } from "lucide-react";
+import { Users, Gift, Truck, ShoppingCart, Check } from "lucide-react";
 import FamilyMenuOrderModal from "./FamilyMenuOrderModal";
 import type { DeliveryMode } from "./TopBar";
 
@@ -164,7 +164,7 @@ const FamilyMenuSection = ({ deliveryMode, deliveryAddress }: FamilyMenuSectionP
                     active:translate-y-0 active:shadow-none
                     transition-all duration-150"
                 >
-                  <MessageCircle className="h-5 w-5" />
+                   <ShoppingCart className="h-5 w-5" />
                   Commander
                 </button>
               </div>

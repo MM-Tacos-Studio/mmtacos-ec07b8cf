@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, MessageCircle, Users, Check } from "lucide-react";
+import { Building2, ShoppingCart, Users, Check } from "lucide-react";
 import EnterpriseMenuOrderModal from "./EnterpriseMenuOrderModal";
 import type { DeliveryMode } from "./TopBar";
 
@@ -153,7 +153,7 @@ const EnterpriseMenuSection = ({ deliveryMode, deliveryAddress }: EnterpriseMenu
                     active:translate-y-0 active:shadow-none
                     transition-all duration-150 text-sm"
                 >
-                  <MessageCircle className="h-4 w-4" />
+                   <ShoppingCart className="h-4 w-4" />
                   Commander
                 </button>
               </div>
