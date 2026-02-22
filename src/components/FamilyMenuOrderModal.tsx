@@ -114,7 +114,8 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, init
       if (error) throw error;
 
       const whatsappUrl = `https://wa.me/22383962830?text=${encodeURIComponent(buildWhatsAppMessage())}`;
-      window.open(whatsappUrl, "_blank");
+      const win = window.open(whatsappUrl, "_blank");
+      if (!win) window.location.href = whatsappUrl;
 
       toast.success("Commande envoyée ! Redirection vers WhatsApp...");
       onClose();
