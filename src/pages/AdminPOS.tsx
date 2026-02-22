@@ -270,7 +270,7 @@ const AdminPOS = () => {
 
   // CLIENT ORDERS SCREEN
   if (screen === "client-orders") {
-    return <ClientOrders onBack={() => setScreen("pos")} />;
+    return <ClientOrders onBack={() => { fetchPendingCount(); setScreen("pos"); }} />;
   }
 
   // HISTORY SCREEN
