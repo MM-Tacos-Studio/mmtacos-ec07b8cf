@@ -127,6 +127,30 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
       unitPrice: selectedSize?.price || taco.price,
     };
 
+    // Build WhatsApp message
+    const buildWhatsAppMessage = () => {
+      const lines: string[] = [];
+      lines.push(`🌮 *Commande Tacos*`);
+      lines.push(`${quantity}x ${taco.name}${selectedSize ? ` (${selectedSize.name})` : ""}`);
+      if (meatChoice) lines.push(`Viande : ${meatChoice}`);
+      const suppList = Object.entries(selectedSupplements)
+        .filter(([_, qty]) => qty > 0)
+        .map(([id, qty]) => {
+          const s = supplements.find((s) => s.id === id);
+          return `${qty}x ${s?.name}`;
+        });
+      if (suppList.length > 0) lines.push(`Suppléments : ${suppList.join(", ")}`);
+      lines.push("");
+      lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
+      lines.push(`📞 ${phoneNumber}`);
+      lines.push("");
+      lines.push(`💰 *Total : ${calculateTotal().toLocaleString()} FCFA*`);
+      lines.push("");
+      lines.push("Merci !");
+      lines.push("#Commandeviasitemmtacos");
+      return lines.join("\n");
+    };
+
     try {
       const { error } = await supabase.from("client_orders" as any).insert({
         order_type: "tacos",
@@ -139,7 +163,11 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
 
       if (error) throw error;
 
-      toast.success("Commande envoyée avec succès ! Nous vous contacterons bientôt.");
+      // Open WhatsApp with pre-filled message
+      const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(buildWhatsAppMessage())}`;
+      window.open(whatsappUrl, "_blank");
+
+      toast.success("Commande envoyée ! Redirection vers WhatsApp...");
       handleClose();
     } catch (e) {
       console.error("Error saving order:", e);
@@ -427,7 +455,7 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
-            {isSubmitting ? "Envoi en cours..." : "Commander"}
+            {isSubmitting ? "Envoi en cours..." : "Commander via WhatsApp"}
           </button>
         </div>
       </DialogContent>

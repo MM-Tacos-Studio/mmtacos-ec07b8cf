@@ -78,6 +78,24 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
       pricePerMenu: menu.pricePerMenu,
     };
 
+    // Build WhatsApp message
+    const buildWhatsAppMessage = () => {
+      const lines: string[] = [];
+      lines.push(`🏢 *Menu Entreprise - ${menu.quantity} Menus*`);
+      if (companyName.trim()) lines.push(`Entreprise : ${companyName.trim()}`);
+      lines.push(`Viande : ${meatDistribution.viande} | Poulet : ${meatDistribution.poulet}`);
+      lines.push(`${menu.pricePerMenu.toLocaleString()} FCFA/menu`);
+      lines.push("");
+      lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
+      lines.push(`📞 ${phoneNumber}`);
+      lines.push("");
+      lines.push(`💰 *Total : ${menu.price.toLocaleString()} FCFA*`);
+      lines.push("");
+      lines.push("Merci !");
+      lines.push("#Commandeviasitemmtacos");
+      return lines.join("\n");
+    };
+
     try {
       const { error } = await supabase.from("client_orders" as any).insert({
         order_type: "enterprise",
@@ -90,7 +108,10 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
 
       if (error) throw error;
 
-      toast.success("Commande envoyée avec succès ! Nous vous contacterons bientôt.");
+      const whatsappUrl = `https://wa.me/22373360131?text=${encodeURIComponent(buildWhatsAppMessage())}`;
+      window.open(whatsappUrl, "_blank");
+
+      toast.success("Commande envoyée ! Redirection vers WhatsApp...");
       onClose();
     } catch (e) {
       console.error("Error saving order:", e);
@@ -223,7 +244,7 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="h-5 w-5" />
-            {isSubmitting ? "Envoi en cours..." : "Commander"}
+            {isSubmitting ? "Envoi en cours..." : "Commander via WhatsApp"}
           </button>
         </div>
       </DialogContent>
