@@ -63,20 +63,20 @@ const ClientOrders = ({ onBack }: ClientOrdersProps) => {
     fetchOrders();
   };
 
-  const playAlertSound = () => {
+  const playAlertSound = async () => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      // Play 3 beeps
-      [0, 0.2, 0.4].forEach((delay) => {
+      await ctx.resume();
+      [0, 0.25, 0.5].forEach((delay) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.frequency.value = 880;
-        osc.type = "sine";
-        gain.gain.value = 0.3;
+        osc.type = "square";
+        gain.gain.value = 0.5;
         osc.start(ctx.currentTime + delay);
-        osc.stop(ctx.currentTime + delay + 0.15);
+        osc.stop(ctx.currentTime + delay + 0.18);
       });
     } catch (e) {
       console.warn("Audio alert failed:", e);
