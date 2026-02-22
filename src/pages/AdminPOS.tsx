@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Trash2, LogOut, History, Lock, Sun, Moon, User } from "lucide-react";
+import { Search, Trash2, LogOut, History, Lock, Sun, Moon, User, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { posProducts, type PosProduct } from "@/lib/posProducts";
 import ReceiptPreview, { type OrderItem } from "@/components/admin/ReceiptPreview";
 import OrderHistory from "@/components/admin/OrderHistory";
 import CashSession from "@/components/admin/CashSession";
+import ClientOrders from "@/components/admin/ClientOrders";
 
-type Screen = "pos" | "receipt" | "history" | "cash";
+type Screen = "pos" | "receipt" | "history" | "cash" | "client-orders";
 
 const AdminPOS = () => {
   const navigate = useNavigate();
@@ -165,6 +166,11 @@ const AdminPOS = () => {
     navigate("/admin/login");
   };
 
+  // CLIENT ORDERS SCREEN
+  if (screen === "client-orders") {
+    return <ClientOrders onBack={() => setScreen("pos")} />;
+  }
+
   // HISTORY SCREEN
   if (screen === "history") {
     return <OrderHistory onBack={() => setScreen("pos")} />;
@@ -249,6 +255,9 @@ const AdminPOS = () => {
               </span>
             </div>
           )}
+          <button onClick={() => setScreen("client-orders")} className="p-2 text-muted-foreground hover:text-foreground" title="Commandes clients">
+            <ShoppingBag className="h-4 w-4" />
+          </button>
           <button onClick={() => setScreen("history")} className="p-2 text-muted-foreground hover:text-foreground" title="Historique">
             <History className="h-4 w-4" />
           </button>
