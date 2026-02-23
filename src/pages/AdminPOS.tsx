@@ -23,6 +23,8 @@ const AdminPOS = () => {
   const [cashOpen, setCashOpen] = useState<boolean | null>(null);
   const [currentShiftName, setCurrentShiftName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [clientPhone, setClientPhone] = useState("+223 ");
+  const [clientQuartier, setClientQuartier] = useState("");
 
   // Check if operational day + shift is active
   const fetchNextOrderNumber = async () => {
@@ -62,53 +64,28 @@ const AdminPOS = () => {
     setNewClientOrderCount(count || 0);
   };
 
-  // Reliable beep using Audio element with base64 WAV
+  // Loud alarm sound ~6 seconds using oscillator
   const playBeep = () => {
     try {
-      // Generate a simple WAV beep programmatically
-      const sampleRate = 8000;
-      const duration = 0.15;
-      const freq = 880;
-      const samples = sampleRate * duration;
-      const buffer = new ArrayBuffer(44 + samples * 2);
-      const view = new DataView(buffer);
-      // WAV header
-      const writeString = (offset: number, str: string) => {
-        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-      };
-      writeString(0, "RIFF");
-      view.setUint32(4, 36 + samples * 2, true);
-      writeString(8, "WAVE");
-      writeString(12, "fmt ");
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, 1, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 2, true);
-      view.setUint16(32, 2, true);
-      view.setUint16(34, 16, true);
-      writeString(36, "data");
-      view.setUint32(40, samples * 2, true);
-      for (let i = 0; i < samples; i++) {
-        const val = Math.sin(2 * Math.PI * freq * i / sampleRate) * 0.8 * 32767;
-        view.setInt16(44 + i * 2, val, true);
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      ctx.resume();
+      const duration = 6; // seconds
+      const now = ctx.currentTime;
+      // Create alternating alarm pattern: high-low siren
+      for (let i = 0; i < 12; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "square";
+        osc.frequency.value = i % 2 === 0 ? 1200 : 800;
+        gain.gain.value = 1.0;
+        const start = now + i * 0.5;
+        osc.start(start);
+        osc.stop(start + 0.45);
       }
-      const blob = new Blob([buffer], { type: "audio/wav" });
-      const url = URL.createObjectURL(blob);
-      
-      // Play 3 beeps
-      const playOne = (delay: number) => {
-        setTimeout(() => {
-          const audio = new Audio(url);
-          audio.volume = 1.0;
-          audio.play().catch(() => {});
-        }, delay);
-      };
-      playOne(0);
-      playOne(250);
-      playOne(500);
     } catch (e) {
-      console.warn("Beep failed:", e);
+      console.warn("Alarm failed:", e);
     }
   };
 
@@ -245,6 +222,7 @@ const AdminPOS = () => {
         amount_paid: total,
         change_amount: 0,
         created_by: session?.user?.id,
+        client_name: clientQuartier ? `${clientPhone.trim()} | ${clientQuartier.trim()}` : clientPhone.trim(),
       }).select("ticket_code").single();
 
       setOrderNumber(numStr);
@@ -260,6 +238,8 @@ const AdminPOS = () => {
 
   const handleNewOrder = () => {
     setOrderItems([]);
+    setClientPhone("+223 ");
+    setClientQuartier("");
     setScreen("pos");
   };
 
@@ -287,7 +267,7 @@ const AdminPOS = () => {
   if (screen === "receipt") {
     return (
       <div className="min-h-screen bg-background">
-        <ReceiptPreview
+      <ReceiptPreview
           items={orderItems}
           orderNumber={orderNumber}
           ticketCode={ticketCode}
@@ -295,6 +275,8 @@ const AdminPOS = () => {
           paymentMethod="especes"
           amountPaid={total}
           onNewOrder={handleNewOrder}
+          clientPhone={clientPhone.trim()}
+          clientQuartier={clientQuartier.trim()}
         />
       </div>
     );
@@ -431,10 +413,26 @@ const AdminPOS = () => {
               <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
             </div>
           {orderItems.length > 0 && (
-            <div className="text-center py-2">
-              <span className="text-4xl font-black text-foreground">{nextOrderNumber}</span>
-              <p className="text-xs text-muted-foreground">N° commande en cours</p>
-            </div>
+            <>
+              <div className="text-center py-2">
+                <span className="text-4xl font-black text-foreground">{nextOrderNumber}</span>
+                <p className="text-xs text-muted-foreground">N° commande en cours</p>
+              </div>
+              <input
+                type="tel"
+                placeholder="Téléphone client (+223...)"
+                value={clientPhone}
+                onChange={e => setClientPhone(e.target.value)}
+                className="w-full p-2 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground"
+              />
+              <input
+                type="text"
+                placeholder="Quartier du client"
+                value={clientQuartier}
+                onChange={e => setClientQuartier(e.target.value)}
+                className="w-full p-2 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground"
+              />
+            </>
           )}
           <button
             onClick={handlePayment}
@@ -466,9 +464,25 @@ const AdminPOS = () => {
           <span className="text-xl font-bold text-foreground">{total.toLocaleString()} CFA</span>
         </div>
         {orderItems.length > 0 && (
-          <div className="text-center py-1">
-            <span className="text-2xl font-black text-foreground">{nextOrderNumber}</span>
-          </div>
+          <>
+            <div className="text-center py-1">
+              <span className="text-2xl font-black text-foreground">{nextOrderNumber}</span>
+            </div>
+            <input
+              type="tel"
+              placeholder="Téléphone (+223...)"
+              value={clientPhone}
+              onChange={e => setClientPhone(e.target.value)}
+              className="w-full p-2 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground"
+            />
+            <input
+              type="text"
+              placeholder="Quartier"
+              value={clientQuartier}
+              onChange={e => setClientQuartier(e.target.value)}
+              className="w-full p-2 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground"
+            />
+          </>
         )}
         <button
           onClick={handlePayment}

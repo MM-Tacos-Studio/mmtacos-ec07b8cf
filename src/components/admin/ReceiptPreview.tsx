@@ -19,11 +19,13 @@ interface ReceiptPreviewProps {
   amountPaid: number;
   onNewOrder: () => void;
   newOrderLabel?: string;
+  clientPhone?: string;
+  clientQuartier?: string;
 }
 
 const SITE_URL = "https://www.mmtacosbamako.com";
 
-const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, amountPaid, onNewOrder, newOrderLabel }: ReceiptPreviewProps) => {
+const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, amountPaid, onNewOrder, newOrderLabel, clientPhone, clientQuartier }: ReceiptPreviewProps) => {
   const receiptRef = useRef<HTMLDivElement>(null);
   const now = new Date();
   const dateStr = now.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -99,6 +101,13 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
         <div class="summary-row"><span>Taxe 0 %</span><span>0 CFA</span></div>
         <div class="summary-row total-row"><span>Total</span><span>${total.toLocaleString()} CFA</span></div>
         <div class="summary-row"><span>Espèces</span><span>${amountPaid.toLocaleString()} CFA</span></div>
+        ${clientPhone || clientQuartier ? `
+        <div class="line"></div>
+        <div style="font-size:12px;padding:4px 0;">
+          ${clientPhone ? `<div><strong>📞 Tel:</strong> ${clientPhone}</div>` : ''}
+          ${clientQuartier ? `<div><strong>📍 Quartier:</strong> ${clientQuartier}</div>` : ''}
+        </div>
+        ` : ''}
         <div class="line"></div>
         <div class="footer">
           <strong>MM TACOS</strong><br/>
@@ -161,6 +170,16 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
           <div className="flex justify-between text-xs py-0.5"><span>Taxe 0 %</span><span>0 CFA</span></div>
           <div className="flex justify-between font-bold text-sm py-1"><span>Total</span><span>{total.toLocaleString()} CFA</span></div>
           <div className="flex justify-between text-xs py-0.5"><span>Espèces</span><span>{amountPaid.toLocaleString()} CFA</span></div>
+
+          {(clientPhone || clientQuartier) && (
+            <>
+              <div className="border-t border-dashed border-gray-400 my-2" />
+              <div className="text-[11px] space-y-0.5">
+                {clientPhone && <p><strong>📞 Tel:</strong> {clientPhone}</p>}
+                {clientQuartier && <p><strong>📍 Quartier:</strong> {clientQuartier}</p>}
+              </div>
+            </>
+          )}
 
           <div className="border-t border-dashed border-gray-400 my-2" />
           <div className="text-center text-[10px]">

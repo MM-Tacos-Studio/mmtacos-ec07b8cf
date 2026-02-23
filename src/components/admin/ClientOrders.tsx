@@ -67,17 +67,20 @@ const ClientOrders = ({ onBack }: ClientOrdersProps) => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       await ctx.resume();
-      [0, 0.25, 0.5].forEach((delay) => {
+      const now = ctx.currentTime;
+      // Loud alternating siren alarm ~6 seconds
+      for (let i = 0; i < 12; i++) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.frequency.value = 880;
         osc.type = "square";
-        gain.gain.value = 0.5;
-        osc.start(ctx.currentTime + delay);
-        osc.stop(ctx.currentTime + delay + 0.18);
-      });
+        osc.frequency.value = i % 2 === 0 ? 1200 : 800;
+        gain.gain.value = 1.0;
+        const start = now + i * 0.5;
+        osc.start(start);
+        osc.stop(start + 0.45);
+      }
     } catch (e) {
       console.warn("Audio alert failed:", e);
     }
