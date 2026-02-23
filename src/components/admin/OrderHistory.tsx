@@ -12,6 +12,7 @@ interface Order {
   created_at: string;
   payment_method: string;
   amount_paid: number;
+  client_name: string | null;
 }
 
 interface OrderHistoryProps {
@@ -47,6 +48,15 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
   });
 
   if (selectedOrder) {
+    // Parse client_name which stores "phone | quartier"
+    let clientPhone = "";
+    let clientQuartier = "";
+    if (selectedOrder.client_name) {
+      const parts = selectedOrder.client_name.split("|").map(s => s.trim());
+      clientPhone = parts[0] || "";
+      clientQuartier = parts[1] || "";
+    }
+
     return (
       <div className="min-h-screen bg-background">
         <ReceiptPreview
@@ -56,6 +66,8 @@ const OrderHistory = ({ onBack }: OrderHistoryProps) => {
           total={selectedOrder.total}
           paymentMethod={selectedOrder.payment_method}
           amountPaid={selectedOrder.amount_paid}
+          clientPhone={clientPhone}
+          clientQuartier={clientQuartier}
           onNewOrder={() => setSelectedOrder(null)}
           newOrderLabel="Retour"
         />
