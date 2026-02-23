@@ -105,7 +105,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
         <div class="line"></div>
         <div style="font-size:12px;padding:4px 0;">
           ${clientPhone ? `<div><strong>📞 Tel:</strong> ${clientPhone}</div>` : ''}
-          ${clientQuartier ? `<div><strong>📍 Quartier:</strong> ${clientQuartier}</div>` : ''}
+          ${clientQuartier ? `<div><strong>🏠 Quartier:</strong> ${clientQuartier}</div>` : ''}
         </div>
         ` : ''}
         <div class="line"></div>
@@ -176,7 +176,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
               <div className="border-t border-dashed border-gray-400 my-2" />
               <div className="text-[11px] space-y-0.5">
                 {clientPhone && <p><strong>📞 Tel:</strong> {clientPhone}</p>}
-                {clientQuartier && <p><strong>📍 Quartier:</strong> {clientQuartier}</p>}
+                {clientQuartier && <p><strong>🏠 Quartier:</strong> {clientQuartier}</p>}
               </div>
             </>
           )}

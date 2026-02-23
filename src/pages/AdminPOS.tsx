@@ -64,26 +64,28 @@ const AdminPOS = () => {
     setNewClientOrderCount(count || 0);
   };
 
-  // Loud alarm sound ~6 seconds using oscillator
+  // Pleasant restaurant chime ~10 seconds
   const playBeep = () => {
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       ctx.resume();
-      const duration = 6; // seconds
       const now = ctx.currentTime;
-      // Create alternating alarm pattern: high-low siren
-      for (let i = 0; i < 12; i++) {
+      // Melodic chime pattern - pleasant restaurant bell sequence
+      const notes = [523, 659, 784, 1047, 784, 659, 523, 659, 784, 1047, 784, 659, 523, 659, 784, 1047, 659, 784, 1047, 784];
+      const noteLength = 0.5;
+      notes.forEach((freq, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.type = "square";
-        osc.frequency.value = i % 2 === 0 ? 1200 : 800;
-        gain.gain.value = 1.0;
-        const start = now + i * 0.5;
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        const start = now + i * noteLength;
+        gain.gain.setValueAtTime(0.7, start);
+        gain.gain.exponentialRampToValueAtTime(0.01, start + noteLength * 0.9);
         osc.start(start);
-        osc.stop(start + 0.45);
-      }
+        osc.stop(start + noteLength);
+      });
     } catch (e) {
       console.warn("Alarm failed:", e);
     }
