@@ -108,7 +108,7 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
 
       if (error) throw error;
 
-      const whatsappUrl = `https://wa.me/22383962830?text=${encodeURIComponent(buildWhatsAppMessage())}`;
+      const whatsappUrl = `https://wa.me/22384437961?text=${encodeURIComponent(buildWhatsAppMessage())}`;
       const win = window.open(whatsappUrl, "_blank");
       if (!win) window.location.href = whatsappUrl;
 
