@@ -19,6 +19,7 @@ const AdminPOS = () => {
   const [nextOrderNumber, setNextOrderNumber] = useState("...");
   const [loading, setLoading] = useState(false);
   const [sizePickerProduct, setSizePickerProduct] = useState<PosProduct | null>(null);
+  const [sizePickerQty, setSizePickerQty] = useState(1);
   const [ticketCode, setTicketCode] = useState("");
   const [cashOpen, setCashOpen] = useState<boolean | null>(null);
   const [currentShiftName, setCurrentShiftName] = useState<string | null>(null);
@@ -170,15 +171,22 @@ const AdminPOS = () => {
   const addProduct = (product: PosProduct) => {
     if (product.sizes && product.sizes.length > 0) {
       setSizePickerProduct(product);
+      setSizePickerQty(1);
       return;
     }
     addItemToOrder(product.id, product.name, product.price);
   };
 
-  const addWithSize = (product: PosProduct, sizeName: string, sizePrice: number) => {
+  const addWithSize = (product: PosProduct, sizeName: string, sizePrice: number, qty: number) => {
     const itemId = `${product.id}-${sizeName}`;
     const itemName = `${product.name} (${sizeName})`;
-    addItemToOrder(itemId, itemName, sizePrice);
+    setOrderItems(prev => {
+      const existing = prev.find(i => i.id === itemId);
+      if (existing) {
+        return prev.map(i => i.id === itemId ? { ...i, qty: i.qty + qty } : i);
+      }
+      return [...prev, { id: itemId, name: itemName, qty, price: sizePrice }];
+    });
     setSizePickerProduct(null);
   };
 
@@ -501,12 +509,23 @@ const AdminPOS = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSizePickerProduct(null)}>
           <div className="bg-card rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
             <h3 className="font-bold text-lg text-foreground mb-1">{sizePickerProduct.name}</h3>
-            <p className="text-sm text-muted-foreground mb-4">Choisissez la taille</p>
+            <p className="text-sm text-muted-foreground mb-3">Choisissez la taille</p>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <button
+                onClick={() => setSizePickerQty(q => Math.max(1, q - 1))}
+                className="w-10 h-10 rounded-full bg-muted text-foreground text-xl font-bold flex items-center justify-center"
+              >−</button>
+              <span className="text-2xl font-black text-foreground w-8 text-center">{sizePickerQty}</span>
+              <button
+                onClick={() => setSizePickerQty(q => q + 1)}
+                className="w-10 h-10 rounded-full bg-primary text-primary-foreground text-xl font-bold flex items-center justify-center"
+              >+</button>
+            </div>
             <div className="flex gap-3">
               {sizePickerProduct.sizes!.map(size => (
                 <button
                   key={size.name}
-                  onClick={() => addWithSize(sizePickerProduct, size.name, size.price)}
+                  onClick={() => addWithSize(sizePickerProduct, size.name, size.price, sizePickerQty)}
                   className="flex-1 bg-muted hover:bg-primary hover:text-primary-foreground transition-colors rounded-lg p-4 text-center"
                 >
                   <p className="text-lg font-bold">{size.name}</p>
