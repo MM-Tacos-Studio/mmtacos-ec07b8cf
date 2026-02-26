@@ -421,6 +421,21 @@ const CashSession = ({ onBack }: CashSessionProps) => {
       return `<tr><td style="padding:4px 16px;">${s.cashier_name || "Caissier"}</td><td style="padding:4px 16px;">${s.session_code}</td><td style="padding:4px 16px;">${openT} → ${closeT}</td><td style="padding:4px 16px;text-align:right;">${(s.total_orders || 0)}</td><td style="padding:4px 16px;text-align:right;font-weight:bold;">${(s.total_sales || 0).toLocaleString()}CFA</td></tr>`;
     }).join("");
 
+    const zOrderRows = orders.map((o: any) => {
+      const oDate = new Date(o.created_at);
+      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">MM-${o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || "—"}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
+    }).join("");
+
+    // Payment breakdown
+    const zPaymentAgg: Record<string, number> = {};
+    orders.forEach((o: any) => {
+      const method = o.payment_method || "Espèces";
+      zPaymentAgg[method] = (zPaymentAgg[method] || 0) + (o.total || 0);
+    });
+    const zPaymentRows = Object.entries(zPaymentAgg).map(([method, amount]) =>
+      `<tr><td style="padding:4px 16px;">${method}</td><td style="padding:4px 16px;text-align:right;">${amount.toLocaleString()}CFA</td></tr>`
+    ).join("");
+
     const html = `<!DOCTYPE html><html><head><title>Z Caisse - ${day.day_code}</title>
 <style>
   @page { size: A4; margin: 15mm; }
@@ -454,6 +469,18 @@ const CashSession = ({ onBack }: CashSessionProps) => {
   <table>
     ${itemRows}
     <tr class="total-row"><td>Total</td><td style="text-align:right;">${totalQty}</td><td style="text-align:right;">${totalSales.toLocaleString()}CFA</td></tr>
+  </table>
+
+  <div class="section-header">Paiements</div>
+  <table>
+    ${zPaymentRows}
+  </table>
+
+  <div class="section-header">Détail des commandes</div>
+  <table>
+    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Référence</th><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
+    ${zOrderRows}
+    <tr class="total-row"><td colspan="3">Total</td><td style="text-align:right;">${totalSales.toLocaleString()}CFA</td></tr>
   </table>
 
   <p style="margin-top:16px;padding:6px 16px;"><strong>Nombre total de transactions :</strong> ${orders.length}</p>
