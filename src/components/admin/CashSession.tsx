@@ -317,7 +317,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
     const orderRows = orders.map((o: any) => {
       const oDate = new Date(o.created_at);
-      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">MM-${o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || "—"}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
+      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || "—"}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">MM-${o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
     }).join("");
 
     // Payment breakdown
@@ -376,7 +376,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
   <div class="section-header">Détail des commandes</div>
   <table>
-    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Référence</th><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
+    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Référence</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
      ${orderRows}
      <tr class="total-row"><td colspan="3">Total</td><td style="text-align:right;">${total.toLocaleString()}CFA</td></tr>
   </table>
@@ -423,7 +423,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
     const zOrderRows = orders.map((o: any) => {
       const oDate = new Date(o.created_at);
-      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">MM-${o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || "—"}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
+      return `<tr><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${o.ticket_code || "—"}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">MM-${o.order_number}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;">${oDate.toLocaleString("fr-FR")}</td><td style="padding:4px 16px;border-bottom:1px solid #e5e5e5;text-align:right;">${(o.total || 0).toLocaleString()}CFA</td></tr>`;
     }).join("");
 
     // Payment breakdown
@@ -478,7 +478,7 @@ const CashSession = ({ onBack }: CashSessionProps) => {
 
   <div class="section-header">Détail des commandes</div>
   <table>
-    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Référence</th><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
+    <tr style="background:#f5f5f5;"><th style="padding:6px 16px;text-align:left;">Ticket</th><th style="padding:6px 16px;text-align:left;">Référence</th><th style="padding:6px 16px;text-align:left;">Date</th><th style="padding:6px 16px;text-align:right;">Total</th></tr>
     ${zOrderRows}
     <tr class="total-row"><td colspan="3">Total</td><td style="text-align:right;">${totalSales.toLocaleString()}CFA</td></tr>
   </table>
