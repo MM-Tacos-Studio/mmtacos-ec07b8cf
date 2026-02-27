@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Minus, ShoppingCart, Phone } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Phone, ShoppingBag } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ const supplements: Supplement[] = [
 ];
 
 const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliveryAddress }: OrderModalProps) => {
+  const { addItem } = useCart();
   const [selectedSupplements, setSelectedSupplements] = useState<Record<string, number>>({});
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<TacoSize | null>(null);
@@ -459,6 +461,38 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
           >
             <ShoppingCart className="h-5 w-5" />
             {isSubmitting ? "Envoi en cours..." : "Commander via WhatsApp"}
+          </button>
+          
+          <button
+            onClick={() => {
+              if (taco.requiresMeatChoice && !meatChoice) {
+                toast.error("Veuillez choisir viande ou poulet");
+                return;
+              }
+              const supplementsList = Object.entries(selectedSupplements)
+                .filter(([_, qty]) => qty > 0)
+                .map(([id, qty]) => {
+                  const supplement = supplements.find((s) => s.id === id);
+                  return { id, name: supplement?.name || "", qty, price: supplement?.price || 0 };
+                });
+              addItem({
+                type: "tacos",
+                name: taco.name,
+                image: taco.image,
+                size: selectedSize?.name,
+                meatChoice: meatChoice || undefined,
+                quantity,
+                unitPrice: selectedSize?.price || taco.price,
+                supplements: supplementsList,
+              });
+              toast.success(`${taco.name} ajouté au panier !`);
+              handleClose();
+            }}
+            className="w-full bg-accent text-foreground py-3 rounded-lg font-bold flex items-center justify-center gap-2 
+              hover:bg-accent/80 transition-all duration-150 mt-2 border border-border"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            Ajouter au panier
           </button>
         </div>
       </DialogContent>

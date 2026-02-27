@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Menu, X, MapPin } from "lucide-react";
+import { Menu, X, MapPin, ShoppingCart } from "lucide-react";
 import logo from "@/assets/mm-tacos-logo.png";
+import { useCart } from "@/contexts/CartContext";
+import CartDrawer from "./CartDrawer";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const { totalItems } = useCart();
 
   const navLinks = [
     { name: "Nos Tacos", href: "#tacos" },
@@ -49,13 +53,41 @@ const Navbar = () => {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-foreground"
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Desktop Cart Icon */}
+          <div className="hidden md:flex items-center">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 text-foreground hover:text-primary transition-colors mr-2"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Cart + Menu Button */}
+          <div className="flex md:hidden items-center gap-1">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 text-foreground"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-foreground"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -85,6 +117,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
     </nav>
   );
 };
