@@ -132,23 +132,27 @@ const OrderModal = ({ isOpen, onClose, taco, initialDeliveryMode, initialDeliver
     // Build WhatsApp message
     const buildWhatsAppMessage = () => {
       const lines: string[] = [];
-      lines.push(`🌮 *Commande Tacos*`);
-      lines.push(`${quantity}x ${taco.name}${selectedSize ? ` (${selectedSize.name})` : ""}`);
+      lines.push("Bonjour je voudrais commander :");
+      lines.push("");
+      lines.push(`${quantity}x ${taco.name}${selectedSize ? ` Taille ${selectedSize.name}` : ""}`);
       if (meatChoice) lines.push(`Viande : ${meatChoice}`);
+      lines.push("");
       const suppList = Object.entries(selectedSupplements)
         .filter(([_, qty]) => qty > 0)
         .map(([id, qty]) => {
           const s = supplements.find((s) => s.id === id);
           return `${qty}x ${s?.name}`;
         });
-      if (suppList.length > 0) lines.push(`Suppléments : ${suppList.join(", ")}`);
+      if (suppList.length > 0) {
+        lines.push(`Suppléments : ${suppList.join(", ")}`);
+        lines.push("");
+      }
+      lines.push(deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Je viendrais récupérer");
       lines.push("");
-      lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
-      lines.push(`📞 ${phoneNumber}`);
-      lines.push("");
-      lines.push(`💰 *Total : ${calculateTotal().toLocaleString()} FCFA*`);
+      lines.push(`Total : ${calculateTotal().toLocaleString()} FCFA`);
       lines.push("");
       lines.push("Merci !");
+      lines.push("");
       lines.push("#Commandeviasitemmtacos");
       return lines.join("\n");
     };
