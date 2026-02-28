@@ -113,7 +113,7 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, init
 
       if (error) throw error;
 
-      const whatsappUrl = `https://wa.me/22384437961?text=${encodeURIComponent(buildWhatsAppMessage())}`;
+      const whatsappUrl = `https://wa.me/22378952678?text=${encodeURIComponent(buildWhatsAppMessage())}`;
       const win = window.open(whatsappUrl, "_blank");
       if (!win) window.location.href = whatsappUrl;
 
