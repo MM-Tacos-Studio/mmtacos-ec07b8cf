@@ -117,7 +117,7 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
                   Voir le Menu
                 </a>
                 <a
-                  href="tel:+22384437961"
+                  href="tel:+22378952678"
                   className="bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground px-8 py-4 rounded-full font-bold text-lg 
                     inline-block border-2 border-primary-foreground/40
                     hover:bg-primary-foreground/30

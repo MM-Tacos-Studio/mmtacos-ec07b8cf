@@ -56,9 +56,9 @@ const TopBar = ({ deliveryMode, onModeChange, showInstallButton = true }: TopBar
     <div className="bg-primary py-2 px-4">
       <div className="container mx-auto flex items-center justify-between text-primary-foreground text-sm">
         <div className="flex items-center gap-2 md:gap-4">
-          <a href="tel:+22373360131" className="flex items-center gap-1 md:gap-2 hover:opacity-80 transition-opacity">
+          <a href="tel:+22378952678" className="flex items-center gap-1 md:gap-2 hover:opacity-80 transition-opacity">
             <Phone className="h-4 w-4" />
-            <span className="font-medium text-xs md:text-sm">+223 73 36 01 31</span>
+            <span className="font-medium text-xs md:text-sm">+223 78 95 26 78</span>
           </a>
           
           {/* Delivery Mode Indicator */}

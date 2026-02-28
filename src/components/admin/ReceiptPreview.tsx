@@ -81,7 +81,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
             Ticket MM-${orderNumber}<br/>
             ${ticketCode ? `Code: ${ticketCode}<br/>` : ""}
             ${dateStr} ${timeStr}<br/>
-            +223 73 36 01 31 / +223 84 43 79 61<br/>
+            +223 78 95 26 78<br/>
             Servi par : MM TACOS CAISSE
           </div>
           <div class="ticket-num">${orderNumber}</div>
@@ -144,7 +144,7 @@ const ReceiptPreview = ({ items, orderNumber, ticketCode, total, paymentMethod, 
               Ticket MM-{orderNumber}<br />
               {ticketCode && <>Code: {ticketCode}<br /></>}
               {dateStr} {timeStr}<br />
-              +223 73 36 01 31 / +223 84 43 79 61<br />
+              +223 78 95 26 78<br />
               Servi par : MM TACOS CAISSE
             </p>
             <p className="text-2xl font-bold my-2">{orderNumber}</p>
