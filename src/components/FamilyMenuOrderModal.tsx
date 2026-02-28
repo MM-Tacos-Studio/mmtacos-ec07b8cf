@@ -87,16 +87,18 @@ const FamilyMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, init
     // Build WhatsApp message
     const buildWhatsAppMessage = () => {
       const lines: string[] = [];
-      lines.push(`👨‍👩‍👧‍👦 *Menu Familial - ${menu.quantity} Menus*`);
+      lines.push("Bonjour je voudrais commander :");
+      lines.push("");
+      lines.push(`${menu.quantity}x Menu Familial`);
       lines.push(`Viande : ${meatDistribution.viande} | Poulet : ${meatDistribution.poulet}`);
-      if (menu.bonus) lines.push(`🎁 ${menu.bonus}`);
+      if (menu.bonus) lines.push(`Bonus : ${menu.bonus}`);
       lines.push("");
-      lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
-      lines.push(`📞 ${phoneNumber}`);
+      lines.push(deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Je viendrais récupérer");
       lines.push("");
-      lines.push(`💰 *Total : ${menu.price.toLocaleString()} FCFA*`);
+      lines.push(`Total : ${menu.price.toLocaleString()} FCFA`);
       lines.push("");
       lines.push("Merci !");
+      lines.push("");
       lines.push("#Commandeviasitemmtacos");
       return lines.join("\n");
     };

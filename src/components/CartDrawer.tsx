@@ -30,34 +30,29 @@ const CartDrawer = ({ isOpen, onClose }: CartDrawerProps) => {
 
   const buildWhatsAppMessage = () => {
     const lines: string[] = [];
-    lines.push("🛒 *Commande Multiple MM'TACOS*");
+    lines.push("Bonjour je voudrais commander :");
     lines.push("");
 
-    items.forEach((item, i) => {
-      lines.push(`${i + 1}. ${item.quantity}x ${item.name}${item.size ? ` (${item.size})` : ""}`);
-      if (item.meatChoice) lines.push(`   Viande : ${item.meatChoice}`);
+    items.forEach((item) => {
+      lines.push(`${item.quantity}x ${item.name}${item.size ? ` Taille ${item.size}` : ""}`);
+      if (item.meatChoice) lines.push(`Viande : ${item.meatChoice}`);
       if (item.meatDistribution) {
-        lines.push(`   Viande: ${item.meatDistribution.viande} | Poulet: ${item.meatDistribution.poulet}`);
+        lines.push(`Viande: ${item.meatDistribution.viande} | Poulet: ${item.meatDistribution.poulet}`);
       }
-      if (item.companyName) lines.push(`   Entreprise : ${item.companyName}`);
+      if (item.companyName) lines.push(`Entreprise : ${item.companyName}`);
       if (item.supplements.length > 0) {
         const suppStr = item.supplements.map((s) => `${s.qty}x ${s.name}`).join(", ");
-        lines.push(`   Suppléments : ${suppStr}`);
+        lines.push(`Suppléments : ${suppStr}`);
       }
-      const itemTotal =
-        item.type === "family" || item.type === "enterprise"
-          ? item.unitPrice * item.quantity
-          : (item.unitPrice + item.supplements.reduce((s, sup) => s + sup.price * sup.qty, 0)) * item.quantity;
-      lines.push(`   → ${itemTotal.toLocaleString()} FCFA`);
+      lines.push("");
     });
 
+    lines.push(deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Je viendrais récupérer");
     lines.push("");
-    lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
-    lines.push(`📞 ${phoneNumber}`);
-    lines.push("");
-    lines.push(`💰 *Total : ${totalPrice.toLocaleString()} FCFA*`);
+    lines.push(`Total : ${totalPrice.toLocaleString()} FCFA`);
     lines.push("");
     lines.push("Merci !");
+    lines.push("");
     lines.push("#Commandeviasitemmtacos");
     return lines.join("\n");
   };

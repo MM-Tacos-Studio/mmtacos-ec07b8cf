@@ -81,17 +81,18 @@ const EnterpriseMenuOrderModal = ({ isOpen, onClose, menu, initialDeliveryMode, 
     // Build WhatsApp message
     const buildWhatsAppMessage = () => {
       const lines: string[] = [];
-      lines.push(`🏢 *Menu Entreprise - ${menu.quantity} Menus*`);
+      lines.push("Bonjour je voudrais commander :");
+      lines.push("");
+      lines.push(`${menu.quantity}x Menu Entreprise`);
       if (companyName.trim()) lines.push(`Entreprise : ${companyName.trim()}`);
       lines.push(`Viande : ${meatDistribution.viande} | Poulet : ${meatDistribution.poulet}`);
-      lines.push(`${menu.pricePerMenu.toLocaleString()} FCFA/menu`);
       lines.push("");
-      lines.push(`📦 ${deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Récupération sur place"}`);
-      lines.push(`📞 ${phoneNumber}`);
+      lines.push(deliveryType === "livraison" ? `Livraison : ${deliveryAddress}` : "Je viendrais récupérer");
       lines.push("");
-      lines.push(`💰 *Total : ${menu.price.toLocaleString()} FCFA*`);
+      lines.push(`Total : ${menu.price.toLocaleString()} FCFA`);
       lines.push("");
       lines.push("Merci !");
+      lines.push("");
       lines.push("#Commandeviasitemmtacos");
       return lines.join("\n");
     };
